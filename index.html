@@ -1,0 +1,620 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>Modern WebP Converter</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+
+    <style>
+        /* THEME */
+
+        :root {
+            --bg: #f6f8fc;
+            --card: #ffffff;
+            --text: #111;
+            --border: #e5e7eb;
+            --primary: #2563eb;
+        }
+
+        /* DARK MODE */
+
+        html.dark {
+
+            --bg: #0f172a;
+            --card: #1e293b;
+            --text: #e5e7eb;
+            --border: #334155;
+        }
+
+
+        /* APPLY COLORS */
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+        }
+
+
+
+        /* BODY */
+
+        body {
+
+            background: var(--bg);
+            color: var(--text);
+            font-family: system-ui;
+        }
+
+
+
+        /* CARD */
+
+        .mainCard {
+
+            background: var(--card);
+            border-radius: 20px;
+            padding: 35px;
+
+            box-shadow:
+                0 10px 30px rgba(0, 0, 0, 0.05);
+
+        }
+
+
+
+        /* DROP */
+
+        .drop {
+
+            border: 2px dashed var(--primary);
+
+            border-radius: 18px;
+
+            padding: 70px;
+
+            text-align: center;
+
+            cursor: pointer;
+
+            transition: .3s;
+
+        }
+
+        .drop:hover {
+
+            transform: scale(1.01);
+
+            background: rgba(37, 99, 235, 0.05);
+
+        }
+
+
+        /* IMAGE CARD */
+
+        .imgCard {
+
+            background: var(--card);
+
+            border-radius: 16px;
+
+            padding: 15px;
+
+            margin-top: 25px;
+
+            border: 1px solid var(--border);
+
+        }
+
+        .imgCard img {
+
+            height: 130px;
+
+            width: 100%;
+
+            object-fit: contain;
+
+        }
+
+
+        /* TEXT */
+
+        .smallText {
+
+            font-size: 13px;
+
+            opacity: .8;
+
+        }
+
+
+
+        /* BUTTONS */
+
+        .btnMain {
+
+            border-radius: 10px;
+
+            padding: 10px 20px;
+
+            font-weight: 600;
+
+        }
+
+        /* MODE TOGGLE */
+
+        .modeToggle {
+
+            background: var(--card);
+
+            border: 1px solid var(--border);
+
+            border-radius: 30px;
+
+            padding: 4px;
+
+            display: inline-flex;
+
+            gap: 4px;
+
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+
+        }
+
+
+        .modeBtn {
+
+            border: 0;
+
+            background: transparent;
+
+            padding: 6px 14px;
+
+            border-radius: 20px;
+
+            font-size: 14px;
+
+            color: var(--text);
+
+            transition: .2s;
+
+            cursor: pointer;
+
+        }
+
+        .modeBtn.active {
+
+            background: var(--primary);
+
+            color: white;
+
+        }
+    </style>
+
+</head>
+
+
+<body>
+
+    <div class="container mt-5 mb-5">
+
+        <div class="mainCard">
+
+            <div class="d-flex justify-content-between">
+                <h3 class="mb-4">
+
+                    Modern WebP Converter
+
+                </h3>
+
+                <div class="d-flex justify-content-end mb-3">
+
+                    <div class="modeToggle">
+
+                        <button class="modeBtn active" onclick="setMode('system')" id="systemBtn">
+                            💻 System
+                        </button>
+
+                        <button class="modeBtn" onclick="setMode('light')" id="lightBtn">
+                            ☀️ Light
+                        </button>
+
+                        <button class="modeBtn" onclick="setMode('dark')" id="darkBtn">
+                            🌙 Dark
+                        </button>
+
+                    </div>
+
+                </div>
+            </div>
+
+
+
+
+            <!-- SETTINGS -->
+
+            <div class="row mb-4">
+
+
+                <div class="col-md-4">
+
+                    Compression
+
+                    <input type="range" min="0.3" max="1" step="0.05" value="0.85" id="quality" class="form-range">
+
+                    <span id="qText">85%</span>
+
+                </div>
+
+
+                <div class="col-md-4">
+
+                    Width
+
+                    <input type="number" id="width" class="form-control" placeholder="Auto">
+
+                </div>
+
+
+                <div class="col-md-4">
+
+                    Height
+
+                    <input type="number" id="height" class="form-control" placeholder="Auto">
+
+                </div>
+
+
+            </div>
+
+
+
+            <!-- DROP AREA -->
+
+            <div class="drop" id="drop">
+
+                <h5>Drag & Drop Images</h5>
+
+                <p class="smallText">
+
+                    or Click to Upload
+
+                </p>
+
+                <input type="file" multiple accept="image/*" id="files" hidden>
+
+            </div>
+
+
+
+            <!-- BUTTONS -->
+
+            <div class="mt-4">
+
+                <button class="btn btn-primary btnMain" onclick="downloadZip()">
+
+                    Download All
+
+                </button>
+
+                <button class="btn btn-outline-danger btnMain ms-2" onclick="clearAll()">
+
+                    Clear
+
+                </button>
+
+            </div>
+
+
+
+            <div class="row" id="preview">
+
+            </div>
+
+
+        </div>
+
+    </div>
+
+
+    <script>
+
+
+        /* QUALITY */
+
+        quality.oninput = () => {
+
+            qText.innerText =
+                Math.round(quality.value * 100) + "%";
+
+        };
+
+
+
+        /* DRAG */
+
+        drop.onclick = () => files.click();
+
+        files.onchange = e => loadFiles(e.target.files);
+
+        drop.ondragover = e => e.preventDefault();
+
+        drop.ondrop = e => {
+
+            e.preventDefault();
+
+            loadFiles(e.dataTransfer.files);
+
+        };
+
+
+
+        let zip = new JSZip();
+
+
+
+        /* LOAD FILES */
+
+        function loadFiles(files) {
+
+            for (let f of files) {
+
+                setTimeout(() => convert(f), 5);
+
+            }
+
+        }
+
+
+
+        /* SMART QUALITY */
+
+        function smartQ(size) {
+
+            let q = parseFloat(quality.value);
+
+            if (size > 2000000) q -= 0.15;
+
+            if (size > 5000000) q -= 0.25;
+
+            return q;
+
+        }
+
+
+
+        /* CONVERT */
+
+        function convert(file) {
+
+            let reader = new FileReader();
+
+            reader.onload = e => {
+
+                let img = new Image();
+
+                img.onload = () => {
+
+                    let w = width.value || img.width;
+                    let h = height.value || img.height;
+
+
+                    let canvas = document.createElement("canvas");
+
+                    canvas.width = w;
+                    canvas.height = h;
+
+
+                    let ctx = canvas.getContext("2d");
+
+                    ctx.imageSmoothingQuality = "high";
+
+                    ctx.drawImage(img, 0, 0, w, h);
+
+
+                    let webp = canvas.toDataURL(
+                        "image/webp",
+                        smartQ(file.size)
+                    );
+
+
+                    /* COMPRESSION */
+
+                    let before = file.size / 1024;
+
+                    let after = webp.length / 1024;
+
+                    let saved = Math.round(
+                        (1 - (after / before)) * 100
+                    );
+
+
+                    /* PREVIEW */
+
+                    preview.innerHTML += `
+
+<div class="col-md-3">
+
+<div class="imgCard">
+
+<img src="${webp}">
+
+<div class="mt-2">
+
+${file.name}
+
+</div>
+
+<div class="smallText">
+
+${before.toFixed(1)} KB → ${after.toFixed(1)} KB
+
+<br>
+
+Saved ${saved}%
+
+</div>
+
+<a
+href="${webp}"
+download="${file.name}.webp"
+class="btn btn-primary btn-sm w-100 mt-2">
+
+Download
+
+</a>
+
+</div>
+
+</div>
+
+`;
+
+
+                    /* ZIP */
+
+                    zip.file(
+
+                        file.name + ".webp",
+
+                        webp.split(',')[1],
+
+                        { base64: true }
+
+                    );
+
+
+                };
+
+                img.src = e.target.result;
+
+            };
+
+            reader.readAsDataURL(file);
+
+        }
+
+
+
+        /* ZIP */
+
+        function downloadZip() {
+
+            zip.generateAsync({ type: "blob" })
+                .then(b => {
+
+                    let a = document.createElement("a");
+
+                    a.href = URL.createObjectURL(b);
+
+                    a.download = "webp-images.zip";
+
+                    a.click();
+
+                });
+
+        }
+
+
+
+        /* CLEAR */
+
+        function clearAll() {
+
+            preview.innerHTML = "";
+
+            zip = new JSZip();
+
+        }
+
+
+        /* THEME ENGINE */
+
+        function setMode(mode) {
+
+            localStorage.setItem("themeMode", mode);
+
+            applyTheme();
+
+            highlightMode();
+
+        }
+
+
+
+        function applyTheme() {
+
+            let mode = localStorage.getItem("themeMode") || "system";
+
+
+            if (mode == "dark") {
+
+                document.documentElement.classList.add("dark");
+
+            }
+
+            else if (mode == "light") {
+
+                document.documentElement.classList.remove("dark");
+
+            }
+
+            else {
+
+                if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+
+                    document.documentElement.classList.add("dark");
+
+                }
+                else {
+
+                    document.documentElement.classList.remove("dark");
+
+                }
+
+            }
+
+        }
+
+
+
+        /* Highlight Active Button */
+
+        function highlightMode() {
+
+            let mode = localStorage.getItem("themeMode") || "system";
+
+
+            document.querySelectorAll(".modeBtn")
+                .forEach(btn => btn.classList.remove("active"));
+
+
+            if (mode == "dark")
+                darkBtn.classList.add("active");
+
+            else if (mode == "light")
+                lightBtn.classList.add("active");
+
+            else
+                systemBtn.classList.add("active");
+
+        }
+
+
+
+        /* INIT */
+
+        applyTheme();
+
+        highlightMode();
+
+    </script>
+
+</body>
+
+</html>
