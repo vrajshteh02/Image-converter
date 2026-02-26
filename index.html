@@ -402,13 +402,13 @@
 
                 img.onload = () => {
 
-                    //let w = width.value || img.width;
-                    //let h = height.value || img.height;
+                    /* CLEAN NAME */
+                    let cleanName = file.name.replace(/\.[^/.]+$/, "");
+
+                    /* SIZE */
 
                     let w = width.value ? parseInt(width.value) : null;
                     let h = height.value ? parseInt(height.value) : null;
-
-                    /* Maintain Aspect Ratio */
 
                     if (w && !h) {
                         h = Math.round((img.height / img.width) * w);
@@ -421,19 +421,16 @@
                         h = img.height;
                     }
 
-
                     let canvas = document.createElement("canvas");
 
                     canvas.width = w;
                     canvas.height = h;
-
 
                     let ctx = canvas.getContext("2d");
 
                     ctx.imageSmoothingQuality = "high";
 
                     ctx.drawImage(img, 0, 0, w, h);
-
 
                     let webp = canvas.toDataURL(
                         "image/webp",
@@ -444,7 +441,6 @@
                     /* COMPRESSION */
 
                     let before = file.size / 1024;
-
                     let after = webp.length / 1024;
 
                     let saved = Math.round(
@@ -463,9 +459,7 @@
 <img src="${webp}">
 
 <div class="mt-2">
-
-${file.name}
-
+${cleanName}
 </div>
 
 <div class="smallText">
@@ -480,7 +474,7 @@ Saved ${saved}%
 
 <a
 href="${webp}"
-download="${file.name}.webp"
+download="${cleanName}.webp"
 class="btn btn-primary btn-sm w-100 mt-2">
 
 Download
@@ -496,18 +490,11 @@ Download
 
                     /* ZIP */
 
-                    let cleanName = file.name.replace(/\.[^/.]+$/, "");
-
                     zip.file(
-
                         cleanName + ".webp",
-
                         webp.split(',')[1],
-
                         { base64: true }
-
                     );
-
 
                 };
 
@@ -518,7 +505,6 @@ Download
             reader.readAsDataURL(file);
 
         }
-
 
 
         /* ZIP */
