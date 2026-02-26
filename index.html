@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -9,7 +9,7 @@
 
     <title>Modern WebP Converter</title>
 
-    
+
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 
@@ -402,8 +402,24 @@
 
                 img.onload = () => {
 
-                    let w = width.value || img.width;
-                    let h = height.value || img.height;
+                    //let w = width.value || img.width;
+                    //let h = height.value || img.height;
+
+                    let w = width.value ? parseInt(width.value) : null;
+                    let h = height.value ? parseInt(height.value) : null;
+
+                    /* Maintain Aspect Ratio */
+
+                    if (w && !h) {
+                        h = Math.round((img.height / img.width) * w);
+                    }
+                    else if (!w && h) {
+                        w = Math.round((img.width / img.height) * h);
+                    }
+                    else if (!w && !h) {
+                        w = img.width;
+                        h = img.height;
+                    }
 
 
                     let canvas = document.createElement("canvas");
@@ -480,9 +496,11 @@ Download
 
                     /* ZIP */
 
+                    let cleanName = file.name.replace(/\.[^/.]+$/, "");
+
                     zip.file(
 
-                        file.name + ".webp",
+                        cleanName + ".webp",
 
                         webp.split(',')[1],
 
@@ -621,8 +639,3 @@ Download
 
 
 </html>
-
-
-
-
-
