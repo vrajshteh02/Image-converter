@@ -1,627 +1,421 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-
-
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-
-    <title>Modern WebP Converter</title>
-
-
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-
-    <style>
-        /* THEME */
-
-        :root {
-            --bg: #f6f8fc;
-            --card: #ffffff;
-            --text: #111;
-            --border: #e5e7eb;
-            --primary: #2563eb;
-        }
-
-        /* DARK MODE */
-
-        html.dark {
-
-            --bg: #0f172a;
-            --card: #1e293b;
-            --text: #e5e7eb;
-            --border: #334155;
-        }
-
-
-        /* APPLY COLORS */
-
-        body {
-            background: var(--bg);
-            color: var(--text);
-        }
-
-
-
-        /* BODY */
-
-        body {
-
-            background: var(--bg);
-            color: var(--text);
-            font-family: system-ui;
-        }
-
-
-
-        /* CARD */
-
-        .mainCard {
-
-            background: var(--card);
-            border-radius: 20px;
-            padding: 35px;
-
-            box-shadow:
-                0 10px 30px rgba(0, 0, 0, 0.05);
-
-        }
-
-
-
-        /* DROP */
-
-        .drop {
-
-            border: 2px dashed var(--primary);
-
-            border-radius: 18px;
-
-            padding: 70px;
-
-            text-align: center;
-
-            cursor: pointer;
-
-            transition: .3s;
-
-        }
-
-        .drop:hover {
-
-            transform: scale(1.01);
-
-            background: rgba(37, 99, 235, 0.05);
-
-        }
-
-
-        /* IMAGE CARD */
-
-        .imgCard {
-
-            background: var(--card);
-
-            border-radius: 16px;
-
-            padding: 15px;
-
-            margin-top: 25px;
-
-            border: 1px solid var(--border);
-
-        }
-
-        .imgCard img {
-
-            height: 130px;
-
-            width: 100%;
-
-            object-fit: contain;
-
-        }
-
-
-        /* TEXT */
-
-        .smallText {
-
-            font-size: 13px;
-
-            opacity: .8;
-
-        }
-
-
-
-        /* BUTTONS */
-
-        .btnMain {
-
-            border-radius: 10px;
-
-            padding: 10px 20px;
-
-            font-weight: 600;
-
-        }
-
-        /* MODE TOGGLE */
-
-        .modeToggle {
-
-            background: var(--card);
-
-            border: 1px solid var(--border);
-
-            border-radius: 30px;
-
-            padding: 4px;
-
-            display: inline-flex;
-
-            gap: 4px;
-
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
-
-        }
-
-
-        .modeBtn {
-
-            border: 0;
-
-            background: transparent;
-
-            padding: 6px 14px;
-
-            border-radius: 20px;
-
-            font-size: 14px;
-
-            color: var(--text);
-
-            transition: .2s;
-
-            cursor: pointer;
-
-        }
-
-        .modeBtn.active {
-
-            background: var(--primary);
-
-            color: white;
-
-        }
-    </style>
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://pagead2.googlesyndication.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self' https://pagead2.googlesyndication.com; frame-src 'self' https://googleads.g.doubleclick.net https://pagead2.googlesyndication.com;">
+    <title>Free Batch Image Converter | WebP, PNG, JPEG to WebP & Modern Formats</title>
+    
+    <!-- SEO Optimization Meta Tags -->
+    <meta name="description" content="Convert your PNG, JPEG, SVG, GIF images to WebP, PNG, or JPEG instantly in your browser. 100% secure, local bulk processing with aspect ratio lock and a before/after visual comparison slider.">
+    <meta name="keywords" content="webp converter, image compressor, batch convert images, png to webp, jpg to webp, bulk image converter, free webp tool, local image conversion">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://webp-converter.local/">
+    
+    <!-- OpenGraph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://webp-converter.local/">
+    <meta property="og:title" content="Free Batch Image Converter | WebP, PNG, JPEG to WebP">
+    <meta property="og:description" content="Convert PNG, JPEG, SVG images to WebP, PNG, or JPEG instantly in your browser. Local bulk processing with aspect ratio lock and visual comparison slider.">
+    <meta property="og:image" content="https://webp-converter.local/assets/og-image.png">
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://webp-converter.local/">
+    <meta property="twitter:title" content="Free Batch Image Converter | WebP, PNG, JPEG to WebP">
+    <meta property="twitter:description" content="Convert PNG, JPEG, SVG images to WebP, PNG, or JPEG instantly in your browser. Local bulk processing with aspect ratio lock and visual comparison slider.">
+
+    <!-- JSZip Library for Zipping files -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js" integrity="sha512-XPd8WY45yO65HCcvrYTCMapk1m/CSx2a8c5gnQ51J7FSutvZjF/OFMb50/cTe3qc1acDMDFX5EZ0XSZcpm8c5g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+    <!-- Custom CSS Styles -->
+    <link rel="stylesheet" href="styles.css">
+
+    <!-- Schema.org JSON-LD for Software Application (Great for SEO Indexing!) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "Modern Batch Image Converter",
+      "alternateName": "WebP Converter Pro",
+      "description": "Convert, resize and compress PNG, JPG, WebP, SVG, and GIF images locally in the browser to WebP, PNG, and JPEG. Supports folders, bulk download, and visual comparison.",
+      "applicationCategory": "MultimediaApplication",
+      "operatingSystem": "All",
+      "browserRequirements": "Requires HTML5 support, FileReader, Canvas",
+      "offers": {
+        "@type": "Offer",
+        "price": "0.00",
+        "priceCurrency": "USD"
+      },
+      "featureList": [
+        "100% Client-side privacy execution",
+        "Batch folder and multi-file processing",
+        "Output to WebP, PNG, JPEG",
+        "Aspect ratio locking and custom resizing",
+        "Interactive side-by-side comparison slider",
+        "Quality factor control with intelligent downscaling overrides"
+      ]
+    }
+    </script>
 </head>
-
-
 <body>
 
-    <div class="container mt-5 mb-5">
+    <!-- ================= SITE HEADER ================= -->
+    <header class="site-header">
+        <div class="nav-container">
+            <a href="index.html" class="logo-link" id="logo">
+                <div class="logo-icon">⇄</div>
+                <span>PicShift</span>
+            </a>
+            
+            <nav>
+                <ul class="nav-menu">
+                    <li><a href="index.html" class="nav-link active">Home</a></li>
+                    <li><a href="about.html" class="nav-link">About</a></li>
+                    <li><a href="contact.html" class="nav-link">Contact</a></li>
+                </ul>
+            </nav>
 
-        <div class="mainCard">
+            <div class="theme-selector">
+                <button class="theme-btn active" onclick="setThemeMode('system')" id="systemBtn" title="Use System Theme">
+                    💻 <span class="d-none-sm">System</span>
+                </button>
+                <button class="theme-btn" onclick="setThemeMode('light')" id="lightBtn" title="Use Light Theme">
+                    ☀️ <span class="d-none-sm">Light</span>
+                </button>
+                <button class="theme-btn" onclick="setThemeMode('dark')" id="darkBtn" title="Use Dark Theme">
+                    🌙 <span class="d-none-sm">Dark</span>
+                </button>
+            </div>
+        </div>
+    </header>
 
-            <div class="d-md-flex justify-content-between">
-                <h3 class="mb-4 text-md-start text-center">
+    <!-- ================= HERO SECTION ================= -->
+    <section class="hero-section">
+        <h1 class="hero-title">Bulk Image Converter</h1>
+        <p class="hero-subtitle">Fast, free, and 100% local. Convert your PNG, JPEG, SVG, or GIF images into optimized WebP, PNG, or JPEG formats in bulk instantly.</p>
+        
+        <div class="trust-badges">
+            <div class="badge-item" id="badge-privacy">
+                <svg viewBox="0 0 20 20" fill="currentColor" width="16" height="16">
+                    <path fill-rule="evenodd" d="M2.166 4.9c.773-.502 1.77-.738 2.766-.693a10.995 10.995 0 017.152 2.725 10.995 10.995 0 017.152-2.725c.996-.045 1.993.191 2.766.693.37.241.6.65.6 1.09v3.47c0 4.72-3.8 8.55-8.518 8.55a8.675 8.675 0 01-8.518-8.55V5.99c0-.44.23-.849.6-1.09zm8.518 8.6c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3z" clip-rule="evenodd" />
+                </svg>
+                <span>100% Secure & Local</span>
+            </div>
+            <div class="badge-item" id="badge-unlimited">
+                <svg viewBox="0 0 20 20" fill="currentColor" width="16" height="16">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                </svg>
+                <span>Unlimited Batch Conversion</span>
+            </div>
+            <div class="badge-item" id="badge-folders">
+                <svg viewBox="0 0 20 20" fill="currentColor" width="16" height="16">
+                    <path d="M2 6a2 2 0 012-2h5l2 2h5a2 2 0 012 2v6a2 2 0 01-2 2H4a2 2 0 01-2-2V6z" />
+                </svg>
+                <span>Preserves Directory Folders</span>
+            </div>
+        </div>
+    </section>
 
-                    Modern WebP Converter
+    <!-- ================= GOOGLE ADSENSE PLACEHOLDER (TOP BANNER) ================= -->
+    <!-- <div class="compliance-wrapper" style="margin: 0 auto 1.5rem auto; max-width: 900px; padding: 0 1.5rem;">
+        <div class="ad-container" id="ad-top-banner">
+            <div class="ad-label">Advertisement</div>
+            <div class="ad-placeholder-text">
+                <svg class="ad-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="2" y="3" width="20" height="14" rx="2" ry="2" />
+                    <line x1="8" y1="21" x2="16" y2="21" />
+                    <line x1="12" y1="17" x2="12" y2="21" />
+                </svg>
+                <span>Responsive Ads Placeholder</span>
+                <span style="font-size: 11px; opacity: 0.6;">(Replace this block with Google AdSense Unit script)</span>
+            </div>
+        </div>
+    </div> -->
 
-                </h3>
+    <!-- ================= MAIN CONVERTER SECTION ================= -->
+    <main class="main-wrapper" id="main-content">
+        <div class="app-card">
+            
+            <!-- TOOL SETTINGS & INPUTS -->
+            <div class="settings-section">
+                
+                <!-- Output Format Selector -->
+                <div class="setting-group">
+                    <label for="format" class="setting-label">
+                        <span>Target Format</span>
+                    </label>
+                    <select id="format" class="form-select">
+                        <option value="webp">WebP (Optimized)</option>
+                        <option value="png">PNG (Lossless)</option>
+                        <option value="jpeg">JPEG (High Compatibility)</option>
+                    </select>
+                </div>
 
-                <div class="d-flex justify-content-md-end justify-content-center mb-3">
+                <!-- Compression Slider -->
+                <div class="setting-group" id="compression-control-wrap">
+                    <label for="quality" class="setting-label">
+                        <span>Compression Quality</span>
+                        <span class="setting-value-badge" id="qText">85%</span>
+                    </label>
+                    <input type="range" min="0.1" max="1" step="0.05" value="0.85" id="quality" class="range-slider">
+                </div>
 
-                    <div class="modeToggle">
-
-                        <button class="modeBtn active" onclick="setMode('system')" id="systemBtn">
-                            💻 System
+                <!-- Custom Resizing with Aspect Lock -->
+                <div class="setting-group">
+                    <label class="setting-label">
+                        <span>Resize Resolution</span>
+                    </label>
+                    <div class="size-inputs">
+                        <input type="number" id="width" class="form-input" placeholder="Width (Auto)" min="1">
+                        
+                        <button id="aspectLock" class="aspect-lock-btn locked" title="Lock Aspect Ratio">
+                            🔒
                         </button>
-
-                        <button class="modeBtn" onclick="setMode('light')" id="lightBtn">
-                            ☀️ Light
-                        </button>
-
-                        <button class="modeBtn" onclick="setMode('dark')" id="darkBtn">
-                            🌙 Dark
-                        </button>
-
+                        
+                        <input type="number" id="height" class="form-input" placeholder="Height (Auto)" min="1">
                     </div>
+                </div>
 
+            </div>
+
+            <!-- DRAG & DROP AREA -->
+            <div class="drop-zone" id="dropZone">
+                <div class="drop-icon-wrapper">
+                    <svg viewBox="0 0 24 24" width="36" height="36" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/>
+                    </svg>
+                </div>
+                <h3 class="drop-title">Drag & Drop Files or Folders Here</h3>
+                <p class="drop-subtitle">Supports multiple formats. PNG, JPEG, WEBP, SVG, and GIF are processed locally in seconds.</p>
+                <input type="file" multiple accept="image/*" id="fileInput" hidden>
+            </div>
+
+            <!-- DYNAMIC ACTIVE PROCESS STATUS / QUEUE STATS PANEL -->
+            <div class="stats-panel" id="statsPanel" style="display: none;">
+                <div class="stat-item">
+                    <div class="stat-val" id="stat-total">0</div>
+                    <div class="stat-label">Total Files</div>
+                </div>
+                <div class="stat-divider"></div>
+                <div class="stat-item">
+                    <div class="stat-val" id="stat-processed">0</div>
+                    <div class="stat-label">Processed</div>
+                </div>
+                <div class="stat-divider"></div>
+                <div class="stat-item">
+                    <div class="stat-val" id="stat-savings">0%</div>
+                    <div class="stat-label">Total Saved</div>
                 </div>
             </div>
 
-
-
-
-            <!-- SETTINGS -->
-
-            <div class="row gy-md-0 gy-3 mb-4">
-
-
-                <div class="col-md-4">
-
-                    Compression
-
-                    <input type="range" min="0.3" max="1" step="0.05" value="0.85" id="quality" class="form-range">
-
-                    <span id="qText">85%</span>
-
+            <!-- APP ACTION CONTROLS -->
+            <div class="action-buttons">
+                <div class="btn-group">
+                    <button class="btn btn-primary" id="downloadAllBtn" onclick="downloadAllZip()" disabled>
+                        <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd"/>
+                        </svg>
+                        <span>Download ZIP Archive</span>
+                    </button>
+                    <button class="btn btn-secondary" id="clearBtn" onclick="clearConverterAll()" disabled>
+                        <span>Clear All</span>
+                    </button>
                 </div>
-
-
-                <div class="col-md-4">
-
-                    Width
-
-                    <input type="number" id="width" class="form-control" placeholder="Auto">
-
-                </div>
-
-
-                <div class="col-md-4">
-
-                    Height
-
-                    <input type="number" id="height" class="form-control" placeholder="Auto">
-
-                </div>
-
-
+                <span id="queue-status" class="drop-subtitle" style="font-weight: 500;">Ready for upload</span>
             </div>
 
-
-
-            <!-- DROP AREA -->
-
-            <div class="drop" id="drop">
-
-                <h5>Drag & Drop Images</h5>
-
-                <p class="smallText">
-
-                    or Click to Upload
-
-                </p>
-
-                <input type="file" multiple accept="image/*" id="files" hidden>
-
+            <!-- IMAGES CONVERTED PREVIEWS CONTAINER -->
+            <div class="previews-grid" id="previewsGrid">
+                <!-- Converted cards dynamically appended here -->
             </div>
-
-
-
-            <!-- BUTTONS -->
-
-            <div class="mt-4">
-
-                <button class="btn btn-primary btnMain" onclick="downloadZip()">
-
-                    Download All
-
-                </button>
-
-                <button class="btn btn-outline-danger btnMain ms-2" onclick="clearAll()">
-
-                    Clear
-
-                </button>
-
-            </div>
-
-
-
-            <div class="row" id="preview">
-
-            </div>
-
 
         </div>
+    </main>
 
+    <!-- ================= BEFORE/AFTER COMPARISON MODAL SLIDER ================= -->
+    <div class="modal" id="sliderModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" id="modalFilename">Image Quality Comparison</h3>
+                <button class="modal-close" onclick="closeComparisonModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <!-- Double layer before/after visual slider container -->
+                <div class="slider-container" id="sliderContainer">
+                    <img class="slider-img slider-img-before" id="imgOriginal" src="" alt="Original Image preview">
+                    <div class="slider-img-after" id="afterContainer">
+                        <img class="slider-img" id="imgCompressed" src="" alt="Compressed Image preview">
+                    </div>
+                    <div class="comparison-slider" id="comparisonSlider">
+                        <div class="slider-handle" id="sliderHandle">⇄</div>
+                    </div>
+                    <div class="slider-label slider-label-before">Original</div>
+                    <div class="slider-label slider-label-after">Compressed</div>
+                </div>
+
+                <div class="comparison-details">
+                    <div class="comp-col">
+                        <div class="comp-title">Original Size</div>
+                        <div class="comp-stat" id="compOriginalSize">0 KB</div>
+                    </div>
+                    <div class="comp-col" style="border-left: 1px solid var(--border)">
+                        <div class="comp-title">Compressed Size</div>
+                        <div class="comp-stat" id="compCompressedSize">0 KB</div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
-
-    <script>
-
-
-        /* QUALITY */
-
-        quality.oninput = () => {
-
-            qText.innerText =
-                Math.round(quality.value * 100) + "%";
-
-        };
-
-
-
-        /* DRAG */
-
-        drop.onclick = () => files.click();
-
-        files.onchange = e => loadFiles(e.target.files);
-
-        drop.ondragover = e => e.preventDefault();
-
-        drop.ondrop = e => {
-
-            e.preventDefault();
-
-            loadFiles(e.dataTransfer.files);
-
-        };
-
-
-
-        let zip = new JSZip();
-
-
-
-        /* LOAD FILES */
-
-        function loadFiles(files) {
-
-            for (let f of files) {
-
-                setTimeout(() => convert(f), 5);
-
-            }
-
-        }
-
-
-
-        /* SMART QUALITY */
-
-        function smartQ(size) {
-
-            let q = parseFloat(quality.value);
-
-            if (size > 2000000) q -= 0.15;
-
-            if (size > 5000000) q -= 0.25;
-
-            return q;
-
-        }
-
-
-
-        /* CONVERT */
-
-        function convert(file) {
-
-            let reader = new FileReader();
-
-            reader.onload = e => {
-
-                let img = new Image();
-
-                img.onload = () => {
-
-                    /* CLEAN NAME */
-                    let cleanName = file.name.replace(/\.[^/.]+$/, "");
-
-                    /* SIZE */
-
-                    let w = width.value ? parseInt(width.value) : null;
-                    let h = height.value ? parseInt(height.value) : null;
-
-                    if (w && !h) {
-                        h = Math.round((img.height / img.width) * w);
-                    }
-                    else if (!w && h) {
-                        w = Math.round((img.width / img.height) * h);
-                    }
-                    else if (!w && !h) {
-                        w = img.width;
-                        h = img.height;
-                    }
-
-                    let canvas = document.createElement("canvas");
-
-                    canvas.width = w;
-                    canvas.height = h;
-
-                    let ctx = canvas.getContext("2d");
-
-                    ctx.imageSmoothingQuality = "high";
-
-                    ctx.drawImage(img, 0, 0, w, h);
-
-                    let webp = canvas.toDataURL(
-                        "image/webp",
-                        smartQ(file.size)
-                    );
-
-
-                    /* COMPRESSION */
-
-                    let before = file.size / 1024;
-                    let after = webp.length / 1024;
-
-                    let saved = Math.round(
-                        (1 - (after / before)) * 100
-                    );
-
-
-                    /* PREVIEW */
-
-                    preview.innerHTML += `
-
-<div class="col-md-3">
-
-<div class="imgCard">
-
-<img src="${webp}">
-
-<div class="mt-2">
-${cleanName}
-</div>
-
-<div class="smallText">
-
-${before.toFixed(1)} KB → ${after.toFixed(1)} KB
-
-<br>
-
-Saved ${saved}%
-
-</div>
-
-<a
-href="${webp}"
-download="${cleanName}.webp"
-class="btn btn-primary btn-sm w-100 mt-2">
-
-Download
-
-</a>
-
-</div>
-
-</div>
-
-`;
-
-
-                    /* ZIP */
-
-                    zip.file(
-                        cleanName + ".webp",
-                        webp.split(',')[1],
-                        { base64: true }
-                    );
-
-                };
-
-                img.src = e.target.result;
-
-            };
-
-            reader.readAsDataURL(file);
-
-        }
-
-
-        /* ZIP */
-
-        function downloadZip() {
-
-            zip.generateAsync({ type: "blob" })
-                .then(b => {
-
-                    let a = document.createElement("a");
-
-                    a.href = URL.createObjectURL(b);
-
-                    a.download = "webp-images.zip";
-
-                    a.click();
-
-                });
-
-        }
-
-
-
-        /* CLEAR */
-
-        function clearAll() {
-
-            preview.innerHTML = "";
-
-            zip = new JSZip();
-
-        }
-
-
-        /* THEME ENGINE */
-
-        function setMode(mode) {
-
-            localStorage.setItem("themeMode", mode);
-
-            applyTheme();
-
-            highlightMode();
-
-        }
-
-
-
-        function applyTheme() {
-
-            let mode = localStorage.getItem("themeMode") || "system";
-
-
-            if (mode == "dark") {
-
-                document.documentElement.classList.add("dark");
-
-            }
-
-            else if (mode == "light") {
-
-                document.documentElement.classList.remove("dark");
-
-            }
-
-            else {
-
-                if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
-
-                    document.documentElement.classList.add("dark");
-
-                }
-                else {
-
-                    document.documentElement.classList.remove("dark");
-
-                }
-
-            }
-
-        }
-
-
-
-        /* Highlight Active Button */
-
-        function highlightMode() {
-
-            let mode = localStorage.getItem("themeMode") || "system";
-
-
-            document.querySelectorAll(".modeBtn")
-                .forEach(btn => btn.classList.remove("active"));
-
-
-            if (mode == "dark")
-                darkBtn.classList.add("active");
-
-            else if (mode == "light")
-                lightBtn.classList.add("active");
-
-            else
-                systemBtn.classList.add("active");
-
-        }
-
-
-
-        /* INIT */
-
-        applyTheme();
-
-        highlightMode();
-
-    </script>
-
+    <!-- ================= RICH SEO & ARTICLES ACCORDION SECTION ================= -->
+    <section class="seo-section">
+        <div class="seo-card">
+            <h2 class="seo-h2">Why Compress & Convert Images to WebP?</h2>
+            <p class="seo-p">WebP is a modern, high-performance image format developed by Google that provides superior lossless and lossy compression for images on the web. Using WebP, webmasters and developers can create smaller, richer images that make websites load up to 3x faster, directly boosting Google search rankings and core web vitals.</p>
+            
+            <div class="seo-grid">
+                <div class="seo-feature-card">
+                    <div class="seo-feature-icon">⚡</div>
+                    <h3 class="seo-feature-title">Boost SEO Rank & Loading Speeds</h3>
+                    <p class="seo-p" style="font-size: 13px; margin-bottom: 0;">Faster websites perform better in search. WebP compresses files 25-34% better than classic JPEG/PNG equivalents while preserving exceptional clarity.</p>
+                </div>
+                <div class="seo-feature-card">
+                    <div class="seo-feature-icon">🛡️</div>
+                    <h3 class="seo-feature-title">Absolute Privacy & Data Safety</h3>
+                    <p class="seo-p" style="font-size: 13px; margin-bottom: 0;">No cloud uploads. All file reading, canvas parsing, and formatting happens locally on your computer inside browser memory. Your private images are never sent to a third-party server.</p>
+                </div>
+            </div>
+
+            <!-- Supported Output Formats Comparison Table -->
+            <h2 class="seo-h2" style="font-size: 1.5rem; margin-top: 2.5rem; text-align: left;">Modern Format Compression Matrix</h2>
+            <div class="comparison-table-wrapper">
+                <table class="comparison-table">
+                    <thead>
+                        <tr>
+                            <th>Format</th>
+                            <th>Transparency</th>
+                            <th>Compression Type</th>
+                            <th>Ideal Use Case</th>
+                            <th>Typical File Savings</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>WebP</strong></td>
+                            <td>Yes (Alpha Channel)</td>
+                            <td>Lossy & Lossless</td>
+                            <td>All-around web imagery, photography, logos</td>
+                            <td><span style="color: var(--success); font-weight:700;">30% - 80% Reduction</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>PNG</strong></td>
+                            <td>Yes (Alpha Channel)</td>
+                            <td>Lossless</td>
+                            <td>Transparent logos, precise vector graphs, icons</td>
+                            <td><span style="color: var(--warning); font-weight:700;">No savings (Raw clarity)</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>JPEG</strong></td>
+                            <td>No</td>
+                            <td>Lossy</td>
+                            <td>Classic heavy photography, legacy devices</td>
+                            <td><span style="color: var(--text-secondary);">Baseline benchmark</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- ================= GOOGLE ADSENSE PLACEHOLDER (MIDDLE BANNER) ================= -->
+        <!-- <div class="ad-container" id="ad-mid-banner" style="max-width: 800px; margin: 2rem auto;">
+            <div class="ad-label">Advertisement</div>
+            <div class="ad-placeholder-text">
+                <svg class="ad-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="2" y="3" width="20" height="14" rx="2" ry="2" />
+                    <line x1="8" y1="21" x2="16" y2="21" />
+                    <line x1="12" y1="17" x2="12" y2="21" />
+                </svg>
+                <span>In-Article Native Ad Block</span>
+                <span style="font-size: 11px; opacity: 0.6;">(Replace this block with Google AdSense Native script)</span>
+            </div>
+        </div> -->
+
+        <!-- FAQ Section with Schema layout -->
+        <div class="seo-card">
+            <h2 class="seo-h2">Frequently Asked Questions</h2>
+            
+            <div class="faq-container">
+                
+                <div class="faq-item">
+                    <button class="faq-trigger" onclick="toggleFaq(this)">
+                        <span>Is this image converter free and unlimited?</span>
+                        <span class="faq-icon">▼</span>
+                    </button>
+                    <div class="faq-content">
+                        <div class="faq-content-inner">
+                            Yes, absolutely. PicShift is a 100% free online browser application. There are no registration forms, no daily limits on image quantities, and no premium subscription paywalls. You can convert thousands of photos in a single run.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <button class="faq-trigger" onclick="toggleFaq(this)">
+                        <span>How does the local client-side conversion work?</span>
+                        <span class="faq-icon">▼</span>
+                    </button>
+                    <div class="faq-content">
+                        <div class="faq-content-inner">
+                            PicShift runs entirely using modern Web APIs (FileReader and HTML5 Canvas context) in your browser sandbox. When you select or drag images, they are loaded into local memory, drawn onto an internal canvas element, converted directly to your target format (like WebP) using browser engines, and downloaded. Your data never traverses the internet, giving you instantaneous speeds and absolute privacy.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <button class="faq-trigger" onclick="toggleFaq(this)">
+                        <span>Does folder batch upload support preserving the directory structure?</span>
+                        <span class="faq-icon">▼</span>
+                    </button>
+                    <div class="faq-content">
+                        <div class="faq-content-inner">
+                            Yes! Our folder traversal engine utilizes modern Webkit Directory Entry APIs. When you drag and drop complete folders containing nested sub-directories and images, PicShift maps their relative pathways automatically. When you download the zipped bundle, your exact nested directory structure is completely preserved with all images converted inside their original directories.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <button class="faq-trigger" onclick="toggleFaq(this)">
+                        <span>Can I resize images with locked aspect ratios?</span>
+                        <span class="faq-icon">▼</span>
+                    </button>
+                    <div class="faq-content">
+                        <div class="faq-content-inner">
+                            Yes. By locking the aspect ratio (the padlock icon is active by default), you can enter either a target Width or target Height, and the other dimension will be calculated instantly to ensure no image stretching or distortion occurs. You can also unlock it to perform free-form dimensions reshaping.
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- ================= SITE FOOTER ================= -->
+    <footer class="site-footer">
+        <div class="footer-container">
+            <div class="footer-logo">⇄ PicShift</div>
+            
+            <nav class="footer-nav">
+                <a href="about.html" class="footer-link">About Us</a>
+                <a href="privacy.html" class="footer-link">Privacy Policy</a>
+                <a href="terms.html" class="footer-link">Terms of Service</a>
+                <a href="contact.html" class="footer-link">Contact Us</a>
+            </nav>
+            
+            <p class="footer-text">Copyright &copy; 2026 PicShift. All processing happens entirely inside your web browser. No files are saved on servers.</p>
+        </div>
+    </footer>
+
+    <!-- Custom JavaScript Logic -->
+    <script src="app.js"></script>
 </body>
-
-
 </html>
