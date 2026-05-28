@@ -1,5 +1,5 @@
 /* ==========================================================================
-   PicShift - Advanced Bulk Image Converter Engine (app.js)
+   PicsConvert - Advanced Bulk Image Converter Engine (app.js)
    100% Local, Safe, and Optimized Browser Execution
    ========================================================================== */
 
@@ -691,7 +691,7 @@ function downloadAllZip() {
         .then(zipBlob => {
             const a = document.createElement("a");
             a.href = URL.createObjectURL(zipBlob);
-            a.download = `PicShift_Optimized_${formatSelect.value}.zip`;
+            a.download = `PicsConvert_Optimized_${formatSelect.value}.zip`;
             a.click();
             
             queueStatus.innerText = "ZIP Archive downloaded successfully!";
