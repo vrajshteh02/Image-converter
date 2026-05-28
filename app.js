@@ -861,3 +861,53 @@ function setupVisualSliderEvents() {
         isDragging = false;
     };
 }
+
+// ==========================================================================
+// 9. DYNAMIC COOKIE CONSENT BANNER CONTROLLER
+// ==========================================================================
+
+function initCookieConsent() {
+    // If choice already made, don't show the banner
+    if (localStorage.getItem("cookieConsent")) return;
+
+    // Create container
+    const banner = document.createElement("div");
+    banner.className = "cookie-banner";
+    banner.id = "cookieBanner";
+
+    banner.innerHTML = `
+        <div class="cookie-header">
+            <span class="cookie-icon">🍪</span>
+            <div class="cookie-title">Cookie Preference</div>
+        </div>
+        <p class="cookie-text">
+            We use cookies to analyze site traffic, personalize content, and serve relevant advertisements through Google AdSense. By clicking "Accept All", you consent to our use of these cookies. Learn more in our <a href="privacy.html" style="text-decoration: underline; font-weight: 600; color: var(--primary);">Privacy Policy</a>.
+        </p>
+        <div class="cookie-actions">
+            <button class="cookie-btn cookie-btn-reject" onclick="handleCookieChoice('rejected')">Reject</button>
+            <button class="cookie-btn cookie-btn-accept" onclick="handleCookieChoice('accepted')">Accept All</button>
+        </div>
+    `;
+
+    document.body.appendChild(banner);
+
+    // Slide up animation after a slight delay
+    setTimeout(() => {
+        banner.classList.add("show");
+    }, 1000);
+}
+
+function handleCookieChoice(choice) {
+    localStorage.setItem("cookieConsent", choice);
+    const banner = document.getElementById("cookieBanner");
+    if (banner) {
+        banner.classList.remove("show");
+        // Remove from DOM after transition finishes
+        setTimeout(() => {
+            banner.remove();
+        }, 500);
+    }
+}
+
+// Auto-run cookie consent check
+initCookieConsent();
