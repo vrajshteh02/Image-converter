@@ -682,7 +682,32 @@ function removeItemFromQueue(id) {
 // ==========================================================================
 
 function downloadAllZip() {
-    if (filesQueue.length === 0 || !activeZip) return;
+    if (filesQueue.length === 0) return;
+
+    // Dynamically initialize activeZip if JSZip has loaded after the page initialization
+    if (!activeZip && typeof JSZip !== 'undefined') {
+        activeZip = new JSZip();
+        // Re-populate the zip from already converted files in queue
+        filesQueue.forEach(item => {
+            if (item.status === 'done' && item.blob) {
+                const ext = formatSelect.value;
+                const pathParts = item.originalPath.split('/');
+                const originalBaseName = pathParts[pathParts.length - 1];
+                const cleanBaseName = originalBaseName.replace(/\.[^/.]+$/, "");
+                
+                pathParts[pathParts.length - 1] = `${cleanBaseName}.${ext}`;
+                const targetZipPath = pathParts.join('/');
+                activeZip.file(targetZipPath, item.blob);
+            }
+        });
+    }
+
+    if (!activeZip) {
+        queueStatus.innerText = "ZIP library failed to load. Please check your network connection.";
+        console.error("PicsConvert Error: JSZip is not loaded or blocked by browser SRI.");
+        alert("The ZIP download feature requires the JSZip library, which failed to load. This can happen if you are offline or if the CDN is blocked by your browser/network.");
+        return;
+    }
     
     queueStatus.innerText = "Creating compressed ZIP bundle...";
     downloadAllBtn.disabled = true;
