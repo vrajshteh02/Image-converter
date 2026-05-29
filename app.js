@@ -819,7 +819,7 @@ function openComparisonModal(item) {
     compCompressedSize.innerText = (item.compressedSize / 1024).toFixed(1) + " KB";
 
     // Set initial 50% slider split
-    afterContainer.style.clipPath = `polygon(0 0, 50% 0, 50% 100%, 0% 100%)`;
+    afterContainer.style.clipPath = `polygon(50% 0, 100% 0, 100% 100%, 50% 100%)`;
     comparisonSlider.style.left = `50%`;
 
     // Open Lighbox
@@ -852,7 +852,7 @@ function setupVisualSliderEvents() {
         percentage = Math.max(0, Math.min(100, percentage));
 
         // Adjust clip path dynamically
-        afterContainer.style.clipPath = `polygon(0 0, ${percentage}% 0, ${percentage}% 100%, 0% 100%)`;
+        afterContainer.style.clipPath = `polygon(${percentage}% 0, 100% 0, 100% 100%, ${percentage}% 100%)`;
         comparisonSlider.style.left = `${percentage}%`;
     }
 
