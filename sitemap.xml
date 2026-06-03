@@ -50,13 +50,19 @@
   </url>
   <url>
     <loc>https://webp-convert-ai.netlify.app/blog.html</loc>
-    <lastmod>2026-05-29</lastmod>
+    <lastmod>2026-06-03</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://webp-convert-ai.netlify.app/blog-mastering-webp.html</loc>
     <lastmod>2026-05-29</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://webp-convert-ai.netlify.app/guide-bulk-resizing.html</loc>
+    <lastmod>2026-06-03</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
