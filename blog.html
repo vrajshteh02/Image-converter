@@ -23,12 +23,12 @@
     <meta property="og:url" content="https://webp-convert-ai.netlify.app/blog.html">
     <meta property="og:title" content="PicsConvert Optimization Blog & Guides | Web Speed & Privacy">
     <meta property="og:description" content="Expert insights on image compression, next-gen WebP & AVIF formatting, Core Web Vitals (LCP) performance, and sandboxed client-side data safety.">
-    <meta property="og:image" content="https://webp-convert-ai.netlify.app/blog-webp-mastery.png">
+    <meta property="og:image" content="https://webp-convert-ai.netlify.app/images/blog-webp-mastery.png">
 
     <!-- Favicon / App Icons -->
-    <link rel="icon" type="image/png" sizes="32x32" href="favicon.png">
-    <link rel="icon" type="image/x-icon" href="favicon.ico">
-    <link rel="shortcut icon" href="favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="images/favicon.png">
+    <link rel="icon" type="image/x-icon" href="images/favicon.ico">
+    <link rel="shortcut icon" href="images/favicon.ico">
 
     <!-- Custom CSS Styles -->
     <link rel="stylesheet" href="styles.css">
@@ -240,17 +240,36 @@
     <main class="main-wrapper">
         <div class="blog-grid">
 
-            <!-- FEATURED ARTICLE CARD (NEW AVIF VS WEBP POST) -->
-            <div class="blog-card blog-card-featured blog-grid-featured" onclick="window.location.href='blog-avif-vs-webp.html'">
+            <!-- FEATURED ARTICLE CARD (NEW EXIF PRIVACY POST) -->
+            <div class="blog-card blog-card-featured blog-grid-featured" onclick="window.location.href='blog-exif-metadata-privacy.html'">
                 <div class="blog-card-img-wrap">
-                    <img class="blog-card-img" src="blog-avif-vs-webp.png" alt="AVIF vs WebP cover illustration representing modern speed and compression standards">
+                    <img class="blog-card-img" src="images/blog-exif-privacy.png" alt="Padlock and camera representing EXIF metadata privacy and hidden GPS coordinates protection">
+                </div>
+                <div class="blog-card-content">
+                    <div class="blog-card-meta">
+                        <span class="blog-card-badge">Privacy & Security</span>
+                        <span>June 11, 2026</span>
+                    </div>
+                    <h2 class="blog-card-title">EXIF Metadata Privacy: Why and How to Strip Image Metadata</h2>
+                    <p class="blog-card-desc">Did you know your images contain your exact GPS location? Learn how camera devices embed sensitive data in files, and how to automatically strip EXIF metadata using offline client-side tools.</p>
+                    <div class="blog-card-footer">
+                        <span>Read Article <span>→</span></span>
+                        <span style="color: var(--text-secondary); font-size: 0.8rem; font-weight: 500;">5 min read</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CARD 1: AVIF VS WEBP POST -->
+            <div class="blog-card" onclick="window.location.href='blog-avif-vs-webp.html'">
+                <div class="blog-card-img-wrap">
+                    <img class="blog-card-img" src="images/blog-avif-vs-webp.png" alt="AVIF vs WebP cover illustration representing modern speed and compression standards">
                 </div>
                 <div class="blog-card-content">
                     <div class="blog-card-meta">
                         <span class="blog-card-badge">File Formats</span>
                         <span>June 8, 2026</span>
                     </div>
-                    <h2 class="blog-card-title">AVIF vs. WebP in 2026: The Ultimate Next-Gen Image Format Showdown</h2>
+                    <h3 class="blog-card-title">AVIF vs. WebP in 2026: The Ultimate Next-Gen Image Format Showdown</h3>
                     <p class="blog-card-desc">AVIF is now the web's gold standard for compression. Learn how to implement AVIF alongside WebP fallbacks for 100% browser coverage and maximum page speeds.</p>
                     <div class="blog-card-footer">
                         <span>Read Article <span>→</span></span>
@@ -262,7 +281,7 @@
             <!-- CARD 2: BULK RESIZING GUIDE -->
             <div class="blog-card" onclick="window.location.href='guide-bulk-resizing.html'">
                 <div class="blog-card-img-wrap">
-                    <img class="blog-card-img" src="blog-bulk-resizing.png" alt="Bulk Image Resizing cover graphic image">
+                    <img class="blog-card-img" src="images/blog-bulk-resizing.png" alt="Bulk Image Resizing cover graphic image">
                 </div>
                 <div class="blog-card-content">
                     <div class="blog-card-meta">
@@ -281,7 +300,7 @@
             <!-- CARD 3: MASTERING WEBP -->
             <div class="blog-card" onclick="window.location.href='blog-mastering-webp.html'">
                 <div class="blog-card-img-wrap">
-                    <img class="blog-card-img" src="blog-webp-mastery.png" alt="Mastering WebP cover graphic image">
+                    <img class="blog-card-img" src="images/blog-webp-mastery.png" alt="Mastering WebP cover graphic image">
                 </div>
                 <div class="blog-card-content">
                     <div class="blog-card-meta">
