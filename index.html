@@ -42,6 +42,10 @@
     <link rel="shortcut icon" href="images/favicon.ico">
 
     <!-- Custom CSS Styles -->
+    <script>(function(){try{var m=localStorage.getItem('themeMode')||'system';if(m==='dark'||(m==='system'&&window.matchMedia('(prefers-color-scheme: dark)').matches)){document.documentElement.classList.add('dark');}}catch(e){}})();</script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&display=swap">
     <link rel="stylesheet" href="styles.css">
 
     <!-- Schema.org JSON-LD for Software Application (Great for SEO Indexing!) -->
@@ -78,88 +82,49 @@
     <!-- ================= SITE HEADER ================= -->
     <header class="site-header">
         <div class="nav-container">
-            <a href="/" class="logo-link" id="logo">
-                <div class="logo-icon">⇄</div>
+            <a href="/" class="logo-link" aria-label="PicsConvert home">
+                <span class="logo-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h13l-3.5-3.5"/><path d="M20 16H7l3.5 3.5"/></svg></span>
                 <span>PicsConvert</span>
             </a>
-            
-            <nav>
+
+            <nav class="site-nav" aria-label="Primary">
                 <ul class="nav-menu">
-                    <li><a href="/" class="nav-link active">Home</a></li>
+                    <li><a href="/" class="nav-link active" aria-current="page">Converter</a></li>
                     <li><a href="blog.html" class="nav-link">Blog</a></li>
                     <li><a href="about.html" class="nav-link">About</a></li>
                     <li><a href="contact.html" class="nav-link">Contact</a></li>
                 </ul>
             </nav>
 
-            <div class="theme-selector">
-                <button class="theme-btn active" onclick="setThemeMode('system')" id="systemBtn" title="Use System Theme">
-                    💻 <span class="d-none-sm">System</span>
+            <div class="theme-selector" role="group" aria-label="Color theme">
+                <button class="theme-btn active" onclick="setThemeMode('system')" id="systemBtn" title="System theme" aria-label="System theme">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
                 </button>
-                <button class="theme-btn" onclick="setThemeMode('light')" id="lightBtn" title="Use Light Theme">
-                    ☀️ <span class="d-none-sm">Light</span>
+                <button class="theme-btn" onclick="setThemeMode('light')" id="lightBtn" title="Light theme" aria-label="Light theme">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
                 </button>
-                <button class="theme-btn" onclick="setThemeMode('dark')" id="darkBtn" title="Use Dark Theme">
-                    🌙 <span class="d-none-sm">Dark</span>
+                <button class="theme-btn" onclick="setThemeMode('dark')" id="darkBtn" title="Dark theme" aria-label="Dark theme">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
                 </button>
             </div>
         </div>
     </header>
 
-    <!-- ================= HERO SECTION ================= -->
-    <section class="hero-section">
-        <h1 class="hero-title">Bulk Image Converter</h1>
-        <p class="hero-subtitle">Fast, free, and 100% local. Convert your PNG, JPEG, SVG, or GIF images into optimized WebP, PNG, or JPEG formats in bulk instantly.</p>
-        
-        <div class="trust-badges">
-            <div class="badge-item" id="badge-privacy">
-                <svg viewBox="0 0 20 20" fill="currentColor" width="16" height="16">
-                    <path fill-rule="evenodd" d="M2.166 4.9c.773-.502 1.77-.738 2.766-.693a10.995 10.995 0 017.152 2.725 10.995 10.995 0 017.152-2.725c.996-.045 1.993.191 2.766.693.37.241.6.65.6 1.09v3.47c0 4.72-3.8 8.55-8.518 8.55a8.675 8.675 0 01-8.518-8.55V5.99c0-.44.23-.849.6-1.09zm8.518 8.6c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3z" clip-rule="evenodd" />
-                </svg>
-                <span>100% Secure & Local</span>
-            </div>
-            <div class="badge-item" id="badge-unlimited">
-                <svg viewBox="0 0 20 20" fill="currentColor" width="16" height="16">
-                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
-                </svg>
-                <span>Unlimited Batch Conversion</span>
-            </div>
-            <div class="badge-item" id="badge-folders">
-                <svg viewBox="0 0 20 20" fill="currentColor" width="16" height="16">
-                    <path d="M2 6a2 2 0 012-2h5l2 2h5a2 2 0 012 2v6a2 2 0 01-2 2H4a2 2 0 01-2-2V6z" />
-                </svg>
-                <span>Preserves Directory Folders</span>
-            </div>
-        </div>
-    </section>
-
-    <!-- ================= GOOGLE ADSENSE PLACEHOLDER (TOP BANNER) ================= -->
-    <!-- <div class="compliance-wrapper" style="margin: 0 auto 1.5rem auto; max-width: 900px; padding: 0 1.5rem;">
-        <div class="ad-container" id="ad-top-banner">
-            <div class="ad-label">Advertisement</div>
-            <div class="ad-placeholder-text">
-                <svg class="ad-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <rect x="2" y="3" width="20" height="14" rx="2" ry="2" />
-                    <line x1="8" y1="21" x2="16" y2="21" />
-                    <line x1="12" y1="17" x2="12" y2="21" />
-                </svg>
-                <span>Responsive Ads Placeholder</span>
-                <span style="font-size: 11px; opacity: 0.6;">(Replace this block with Google AdSense Unit script)</span>
-            </div>
-        </div>
-    </div> -->
-
-    <!-- ================= MAIN CONVERTER SECTION ================= -->
+        <!-- ================= MAIN CONVERTER SECTION ================= -->
     <main class="main-wrapper" id="main-content">
         <div class="app-card">
-            
+
             <!-- TOOL SETTINGS & INPUTS -->
-            <div class="settings-section">
-                
+            <aside class="settings-section" aria-label="Output settings">
+                <div class="panel-heading">
+                    <span>Output settings</span>
+                    <span>01</span>
+                </div>
+
                 <!-- Output Format Selector -->
                 <div class="setting-group">
                     <label for="format" class="setting-label">
-                        <span>Target Format</span>
+                        <span>Target format</span>
                     </label>
                     <select id="format" class="form-select">
                         <option value="webp">WebP (Optimized)</option>
@@ -171,93 +136,116 @@
                 <!-- Compression Slider -->
                 <div class="setting-group" id="compression-control-wrap">
                     <label for="quality" class="setting-label">
-                        <span>Compression Quality</span>
+                        <span>Quality</span>
                         <span class="setting-value-badge" id="qText">85%</span>
                     </label>
                     <input type="range" min="0.1" max="1" step="0.05" value="0.85" id="quality" class="range-slider">
+                    <div class="range-scale" aria-hidden="true"><span>Smaller</span><span>Sharper</span></div>
                 </div>
 
                 <!-- Custom Resizing with Aspect Lock -->
                 <div class="setting-group">
-                    <label class="setting-label">
-                        <span>Resize Resolution</span>
+                    <label for="width" class="setting-label">
+                        <span>Resize (px)</span>
                     </label>
                     <div class="size-inputs">
-                        <input type="number" id="width" class="form-input" placeholder="Width (Auto)" min="1">
-                        
-                        <button id="aspectLock" class="aspect-lock-btn locked" title="Lock Aspect Ratio">
-                            🔒
+                        <input type="number" id="width" class="form-input" placeholder="Width" min="1" aria-label="Width in pixels">
+                        <button id="aspectLock" class="aspect-lock-btn locked" title="Lock Aspect Ratio" type="button">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
                         </button>
-                        
-                        <input type="number" id="height" class="form-input" placeholder="Height (Auto)" min="1">
+                        <input type="number" id="height" class="form-input" placeholder="Height" min="1" aria-label="Height in pixels">
+                    </div>
+                    <p class="setting-hint">Leave blank to keep original dimensions.</p>
+                </div>
+
+                <p class="settings-note">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                    <span>Changing a setting re-processes the whole queue. Files stay in browser memory only.</span>
+                </p>
+            </aside>
+
+            <div class="workspace">
+                <!-- DRAG & DROP AREA -->
+                <div class="drop-zone" id="dropZone" role="button" tabindex="0" aria-label="Choose images to convert">
+                    <div class="drop-icon-wrapper">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/>
+                        </svg>
+                    </div>
+                    <h2 class="drop-title">Drop files or folders, or <span class="drop-browse">browse</span></h2>
+                    <p class="drop-subtitle">Processed locally in seconds. Nothing is uploaded.</p>
+                    <ul class="format-chips" aria-label="Supported formats">
+                        <li>PNG</li><li>JPEG</li><li>WEBP</li><li>SVG</li><li>GIF</li>
+                    </ul>
+                    <input type="file" multiple accept="image/*" id="fileInput" hidden>
+                </div>
+
+                <!-- DYNAMIC ACTIVE PROCESS STATUS / QUEUE STATS PANEL -->
+                <div class="stats-panel" id="statsPanel" style="display: none;">
+                    <div class="stat-item">
+                        <div class="stat-val" id="stat-total">0</div>
+                        <div class="stat-label">Files</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-val" id="stat-processed">0</div>
+                        <div class="stat-label">Processed</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-val" id="stat-savings">0%</div>
+                        <div class="stat-label">Saved</div>
                     </div>
                 </div>
 
+                <!-- APP ACTION CONTROLS -->
+                <div class="action-buttons">
+                    <div class="btn-group">
+                        <button class="btn btn-primary" id="downloadAllBtn" onclick="downloadAllZip()" disabled>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+                            <span>Download ZIP</span>
+                        </button>
+                        <button class="btn btn-secondary" id="clearBtn" onclick="clearConverterAll()" disabled>
+                            <span>Clear all</span>
+                        </button>
+                    </div>
+                    <span id="queue-status" class="queue-status">Ready for upload</span>
+                </div>
+
+                <!-- IMAGES CONVERTED PREVIEWS CONTAINER -->
+                <div class="previews-grid" id="previewsGrid"></div>
             </div>
 
-            <!-- DRAG & DROP AREA -->
-            <div class="drop-zone" id="dropZone">
-                <div class="drop-icon-wrapper">
-                    <svg viewBox="0 0 24 24" width="36" height="36" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/>
-                    </svg>
-                </div>
-                <h3 class="drop-title">Drag & Drop Files or Folders Here</h3>
-                <p class="drop-subtitle">Supports multiple formats. PNG, JPEG, WEBP, SVG, and GIF are processed locally in seconds.</p>
-                <input type="file" multiple accept="image/*" id="fileInput" hidden>
+        </div>
+        <div class="tool-meta">
+            <div class="tool-intro">
+                <p class="eyebrow"><span class="eyebrow-dot"></span>Runs 100% in your browser</p>
+                <h1 class="hero-title">The bulk image converter that <em>never</em> uploads.</h1>
+                <p class="hero-subtitle">Convert PNG, JPEG, SVG and GIF images into optimized WebP, PNG or JPEG in seconds. Drop in whole folders, tune quality, and download a single ZIP, all without a byte leaving your device.</p>
             </div>
-
-            <!-- DYNAMIC ACTIVE PROCESS STATUS / QUEUE STATS PANEL -->
-            <div class="stats-panel" id="statsPanel" style="display: none;">
-                <div class="stat-item">
-                    <div class="stat-val" id="stat-total">0</div>
-                    <div class="stat-label">Total Files</div>
-                </div>
-                <div class="stat-divider"></div>
-                <div class="stat-item">
-                    <div class="stat-val" id="stat-processed">0</div>
-                    <div class="stat-label">Processed</div>
-                </div>
-                <div class="stat-divider"></div>
-                <div class="stat-item">
-                    <div class="stat-val" id="stat-savings">0%</div>
-                    <div class="stat-label">Total Saved</div>
-                </div>
-            </div>
-
-            <!-- APP ACTION CONTROLS -->
-            <div class="action-buttons">
-                <div class="btn-group">
-                    <button class="btn btn-primary" id="downloadAllBtn" onclick="downloadAllZip()" disabled>
-                        <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
-                            <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd"/>
-                        </svg>
-                        <span>Download ZIP Archive</span>
-                    </button>
-                    <button class="btn btn-secondary" id="clearBtn" onclick="clearConverterAll()" disabled>
-                        <span>Clear All</span>
-                    </button>
-                </div>
-                <span id="queue-status" class="drop-subtitle" style="font-weight: 500;">Ready for upload</span>
-            </div>
-
-            <!-- IMAGES CONVERTED PREVIEWS CONTAINER -->
-            <div class="previews-grid" id="previewsGrid">
-                <!-- Converted cards dynamically appended here -->
-            </div>
-
+            <ul class="trust-badges">
+                <li class="badge-item" id="badge-privacy">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>
+                    <span>100% secure &amp; local</span>
+                </li>
+                <li class="badge-item" id="badge-unlimited">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18.178 8c5.096 0 5.096 8 0 8-5.095 0-7.133-8-12.739-8-4.585 0-4.585 8 0 8 5.606 0 7.644-8 12.74-8z"/></svg>
+                    <span>Unlimited batch conversion</span>
+                </li>
+                <li class="badge-item" id="badge-folders">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.93a2 2 0 0 1-1.66-.9l-.82-1.2A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2z"/></svg>
+                    <span>Preserves folder structure</span>
+                </li>
+            </ul>
         </div>
     </main>
 
     <!-- ================= BEFORE/AFTER COMPARISON MODAL SLIDER ================= -->
-    <div class="modal" id="sliderModal">
+    <div class="modal" id="sliderModal" role="dialog" aria-modal="true" aria-labelledby="modalFilename">
         <div class="modal-content">
             <div class="modal-header">
                 <h3 class="modal-title" id="modalFilename">Image Quality Comparison</h3>
-                <button class="modal-close" onclick="closeComparisonModal()">&times;</button>
+                <button class="modal-close" onclick="closeComparisonModal()" aria-label="Close comparison">&times;</button>
             </div>
             <div class="modal-body">
-                <!-- Double layer before/after visual slider container -->
                 <div class="slider-container" id="sliderContainer">
                     <img class="slider-img slider-img-before" id="imgOriginal" src="" alt="Original Image preview">
                     <div class="slider-img-after" id="afterContainer">
@@ -272,11 +260,11 @@
 
                 <div class="comparison-details">
                     <div class="comp-col">
-                        <div class="comp-title">Original Size</div>
+                        <div class="comp-title">Original size</div>
                         <div class="comp-stat" id="compOriginalSize">0 KB</div>
                     </div>
-                    <div class="comp-col" style="border-left: 1px solid var(--border)">
-                        <div class="comp-title">Compressed Size</div>
+                    <div class="comp-col">
+                        <div class="comp-title">Compressed size</div>
                         <div class="comp-stat" id="compCompressedSize">0 KB</div>
                     </div>
                 </div>
@@ -284,89 +272,128 @@
         </div>
     </div>
 
-    <!-- ================= RICH SEO & ARTICLES ACCORDION SECTION ================= -->
-    <section class="seo-section">
-        <div class="seo-card">
-            <h2 class="seo-h2">Why Compress & Convert Images to WebP?</h2>
-            <p class="seo-p">WebP is a modern, high-performance image format developed by Google that provides superior lossless and lossy compression for images on the web. Using WebP, webmasters and developers can create smaller, richer images that make websites load up to 3x faster, directly boosting Google search rankings and core web vitals.</p>
-            
-            <div class="seo-grid">
-                <div class="seo-feature-card">
-                    <div class="seo-feature-icon">⚡</div>
-                    <h3 class="seo-feature-title">Boost SEO Rank & Loading Speeds</h3>
-                    <p class="seo-p" style="font-size: 13px; margin-bottom: 0;">Faster websites perform better in search. WebP compresses files 25-34% better than classic JPEG/PNG equivalents while preserving exceptional clarity.</p>
-                </div>
-                <div class="seo-feature-card">
-                    <div class="seo-feature-icon">🛡️</div>
-                    <h3 class="seo-feature-title">Absolute Privacy & Data Safety</h3>
-                    <p class="seo-p" style="font-size: 13px; margin-bottom: 0;">No cloud uploads. All file reading, canvas parsing, and formatting happens locally on your computer inside browser memory. Your private images are never sent to a third-party server.</p>
-                </div>
-            </div>
+    <!-- ================= HOW IT WORKS ================= -->
+    <section class="section" aria-labelledby="how-title">
+        <div class="section-head">
+            <p class="eyebrow">How it works</p>
+            <h2 class="section-title" id="how-title">Three steps. <em>Zero</em> uploads.</h2>
+        </div>
+        <ol class="steps-grid">
+            <li class="step">
+                <div class="step-num">01 / Drop</div>
+                <h3 class="step-title">Add images or entire folders</h3>
+                <p class="step-desc">Drag files or nested directories onto the converter. They are read straight into browser memory with the FileReader API.</p>
+            </li>
+            <li class="step">
+                <div class="step-num">02 / Tune</div>
+                <h3 class="step-title">Pick format, quality &amp; size</h3>
+                <p class="step-desc">Choose WebP, PNG or JPEG, dial in compression, and resize with a locked aspect ratio. Every file re-encodes instantly on canvas.</p>
+            </li>
+            <li class="step">
+                <div class="step-num">03 / Download</div>
+                <h3 class="step-title">Compare, then grab a ZIP</h3>
+                <p class="step-desc">Inspect any result with the before/after slider, then download one file or a ZIP that mirrors your original folder tree.</p>
+            </li>
+        </ol>
+    </section>
 
-            <!-- Supported Output Formats Comparison Table -->
-            <h2 class="seo-h2" style="font-size: 1.5rem; margin-top: 2.5rem; text-align: left;">Modern Format Compression Matrix</h2>
-            <div class="comparison-table-wrapper">
-                <table class="comparison-table">
-                    <thead>
-                        <tr>
-                            <th>Format</th>
-                            <th>Transparency</th>
-                            <th>Compression Type</th>
-                            <th>Ideal Use Case</th>
-                            <th>Typical File Savings</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td><strong>WebP</strong></td>
-                            <td>Yes (Alpha Channel)</td>
-                            <td>Lossy & Lossless</td>
-                            <td>All-around web imagery, photography, logos</td>
-                            <td><span style="color: var(--success); font-weight:700;">30% - 80% Reduction</span></td>
-                        </tr>
-                        <tr>
-                            <td><strong>PNG</strong></td>
-                            <td>Yes (Alpha Channel)</td>
-                            <td>Lossless</td>
-                            <td>Transparent logos, precise vector graphs, icons</td>
-                            <td><span style="color: var(--warning); font-weight:700;">No savings (Raw clarity)</span></td>
-                        </tr>
-                        <tr>
-                            <td><strong>JPEG</strong></td>
-                            <td>No</td>
-                            <td>Lossy</td>
-                            <td>Classic heavy photography, legacy devices</td>
-                            <td><span style="color: var(--text-secondary);">Baseline benchmark</span></td>
-                        </tr>
-                    </tbody>
-                </table>
+    <!-- ================= WHY WEBP ================= -->
+    <section class="section" aria-labelledby="why-title">
+        <div class="section-head">
+            <p class="eyebrow">Why compress &amp; convert to WebP</p>
+            <h2 class="section-title" id="why-title">Smaller files, faster pages, <em>better</em> rankings.</h2>
+            <p class="section-lede">WebP is a modern image format developed by Google that delivers superior lossless and lossy compression. Smaller, richer images make websites load up to 3x faster, directly improving Core Web Vitals and search visibility.</p>
+        </div>
+
+        <div class="feature-grid">
+            <div class="feature-card span-4">
+                <div class="feature-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 2 3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+                </div>
+                <h3 class="feature-title">Boost SEO rank &amp; loading speeds</h3>
+                <p class="feature-desc">Faster websites perform better in search. WebP compresses files 25–34% better than classic JPEG/PNG equivalents while preserving exceptional clarity.</p>
+            </div>
+            <div class="feature-card span-2">
+                <div class="feature-stat">80%</div>
+                <p class="feature-desc">Typical file size reduction when converting photographic PNGs to WebP.</p>
+            </div>
+            <div class="feature-card span-2 is-dark">
+                <div class="feature-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                </div>
+                <h3 class="feature-title">Absolute privacy &amp; data safety</h3>
+                <p class="feature-desc">No cloud uploads. File reading, canvas parsing and encoding all happen inside your browser. Your images never touch a server.</p>
+            </div>
+            <div class="feature-card span-2">
+                <div class="feature-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.93a2 2 0 0 1-1.66-.9l-.82-1.2A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2z"/></svg>
+                </div>
+                <h3 class="feature-title">Folder-aware batches</h3>
+                <p class="feature-desc">Drop nested directories and get a ZIP back with the exact same structure.</p>
+            </div>
+            <div class="feature-card span-2">
+                <div class="feature-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v18"/><rect x="3" y="3" width="18" height="18" rx="2"/><path d="m8 9-3 3 3 3M16 9l3 3-3 3"/></svg>
+                </div>
+                <h3 class="feature-title">Before / after slider</h3>
+                <p class="feature-desc">Drag a split view across any result to verify quality before you ship it.</p>
             </div>
         </div>
 
-        <!-- ================= GOOGLE ADSENSE PLACEHOLDER (MIDDLE BANNER) ================= -->
-        <!-- <div class="ad-container" id="ad-mid-banner" style="max-width: 800px; margin: 2rem auto;">
-            <div class="ad-label">Advertisement</div>
-            <div class="ad-placeholder-text">
-                <svg class="ad-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <rect x="2" y="3" width="20" height="14" rx="2" ry="2" />
-                    <line x1="8" y1="21" x2="16" y2="21" />
-                    <line x1="12" y1="17" x2="12" y2="21" />
-                </svg>
-                <span>In-Article Native Ad Block</span>
-                <span style="font-size: 11px; opacity: 0.6;">(Replace this block with Google AdSense Native script)</span>
-            </div>
-        </div> -->
+        <!-- Supported Output Formats Comparison Table -->
+        <h3 class="subsection-title">Modern format compression matrix</h3>
+        <div class="comparison-table-wrapper">
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>Format</th>
+                        <th>Transparency</th>
+                        <th>Compression</th>
+                        <th>Ideal use case</th>
+                        <th>Typical savings</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>WebP</strong></td>
+                        <td>Yes (alpha channel)</td>
+                        <td>Lossy &amp; lossless</td>
+                        <td>All-around web imagery, photography, logos</td>
+                        <td><span class="tag tag-success">30–80% smaller</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>PNG</strong></td>
+                        <td>Yes (alpha channel)</td>
+                        <td>Lossless</td>
+                        <td>Transparent logos, precise graphs, icons</td>
+                        <td><span class="tag tag-warning">No savings (raw clarity)</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>JPEG</strong></td>
+                        <td>No</td>
+                        <td>Lossy</td>
+                        <td>Classic photography, legacy devices</td>
+                        <td><span class="tag tag-neutral">Baseline</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
 
-        <!-- FAQ Section with Schema layout -->
-        <div class="seo-card">
-            <h2 class="seo-h2">Frequently Asked Questions</h2>
-            
+    <!-- ================= FAQ ================= -->
+    <section class="section" aria-labelledby="faq-title">
+        <div class="faq-layout">
+            <div class="section-head">
+                <p class="eyebrow">FAQ</p>
+                <h2 class="section-title" id="faq-title">Frequently asked questions</h2>
+                <p class="section-lede">Still curious? <a href="contact.html">Send us a message</a> and we will get back within a day.</p>
+            </div>
+
             <div class="faq-container">
-                
                 <div class="faq-item">
                     <button class="faq-trigger" onclick="toggleFaq(this)">
                         <span>Is this image converter free and unlimited?</span>
-                        <span class="faq-icon">▼</span>
+                        <span class="faq-icon" aria-hidden="true">▼</span>
                     </button>
                     <div class="faq-content">
                         <div class="faq-content-inner">
@@ -378,7 +405,7 @@
                 <div class="faq-item">
                     <button class="faq-trigger" onclick="toggleFaq(this)">
                         <span>How does the local client-side conversion work?</span>
-                        <span class="faq-icon">▼</span>
+                        <span class="faq-icon" aria-hidden="true">▼</span>
                     </button>
                     <div class="faq-content">
                         <div class="faq-content-inner">
@@ -389,8 +416,8 @@
 
                 <div class="faq-item">
                     <button class="faq-trigger" onclick="toggleFaq(this)">
-                        <span>Does folder batch upload support preserving the directory structure?</span>
-                        <span class="faq-icon">▼</span>
+                        <span>Does folder batch upload preserve the directory structure?</span>
+                        <span class="faq-icon" aria-hidden="true">▼</span>
                     </button>
                     <div class="faq-content">
                         <div class="faq-content-inner">
@@ -402,120 +429,133 @@
                 <div class="faq-item">
                     <button class="faq-trigger" onclick="toggleFaq(this)">
                         <span>Can I resize images with locked aspect ratios?</span>
-                        <span class="faq-icon">▼</span>
+                        <span class="faq-icon" aria-hidden="true">▼</span>
                     </button>
                     <div class="faq-content">
                         <div class="faq-content-inner">
-                            Yes. By locking the aspect ratio (the padlock icon is active by default), you can enter either a target Width or target Height, and the other dimension will be calculated instantly to ensure no image stretching or distortion occurs. You can also unlock it to perform free-form dimensions reshaping.
+                            Yes. By locking the aspect ratio (the padlock is active by default), you can enter either a target width or target height, and the other dimension will be calculated instantly to ensure no image stretching or distortion occurs. You can also unlock it to perform free-form resizing.
                         </div>
                     </div>
                 </div>
-
             </div>
         </div>
+    </section>
 
-        <!-- ================= EDUCATIONAL GUIDES & LEARNING HUB ================= -->
-        <div class="learning-hub-section">
-            <h2 class="learning-hub-title">Optimization Guides & Technical Insights</h2>
-            <div class="learning-hub-grid">
-                
-                <div class="learning-card">
-                    <span class="learning-tag">File Formats</span>
-                    <h3 class="learning-card-title">WebP vs. JPEG: Format Showdown</h3>
-                    <p class="learning-card-desc">Compare compression algorithms, 25-35% file size reductions, and Core Web Vitals performance between WebP and JPEG.</p>
-                    <a href="blog-webp-vs-jpeg-comparison.html" class="learning-link">
-                        <span>Read Article</span>
-                        <svg viewBox="0 0 20 20" fill="currentColor" width="16" height="16">
-                            <path fill-rule="evenodd" d="M12.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-2.293-2.293a1 1 0 010-1.414z" clip-rule="evenodd" />
-                        </svg>
-                    </a>
-                </div>
-
-                <div class="learning-card">
-                    <span class="learning-tag">Web Optimization</span>
-                    <h3 class="learning-card-title">Lossless vs. Lossy Image Compression</h3>
-                    <p class="learning-card-desc">Understand quantization, data retention, and how the 75-82% quality slider sweet spot saves up to 80% bandwidth with 0 blur.</p>
-                    <a href="blog-image-compression-lossless-vs-lossy.html" class="learning-link">
-                        <span>Read Article</span>
-                        <svg viewBox="0 0 20 20" fill="currentColor" width="16" height="16">
-                            <path fill-rule="evenodd" d="M12.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-2.293-2.293a1 1 0 010-1.414z" clip-rule="evenodd" />
-                        </svg>
-                    </a>
-                </div>
-
-                <div class="learning-card">
-                    <span class="learning-tag">File Formats</span>
-                    <h3 class="learning-card-title">Convert SVG to WebP & PNG</h3>
-                    <p class="learning-card-desc">Master rasterizing vector SVGs for OpenGraph previews, prevent Retina blur with DPR scaling, and eliminate XML injection risks.</p>
-                    <a href="blog-svg-to-webp-png-conversion.html" class="learning-link">
-                        <span>Read Article</span>
-                        <svg viewBox="0 0 20 20" fill="currentColor" width="16" height="16">
-                            <path fill-rule="evenodd" d="M12.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-2.293-2.293a1 1 0 010-1.414z" clip-rule="evenodd" />
-                        </svg>
-                    </a>
-                </div>
-
-                <div class="learning-card">
-                    <span class="learning-tag">Transparency</span>
-                    <h3 class="learning-card-title">PNG to WebP with Alpha Channels</h3>
-                    <p class="learning-card-desc">Learn how WebP preserves full alpha transparency in both lossy and lossless modes, replacing bulky PNG files effortlessly.</p>
-                    <a href="blog-png-to-webp-transparency.html" class="learning-link">
-                        <span>Read Article</span>
-                        <svg viewBox="0 0 20 20" fill="currentColor" width="16" height="16">
-                            <path fill-rule="evenodd" d="M12.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-2.293-2.293a1 1 0 010-1.414z" clip-rule="evenodd" />
-                        </svg>
-                    </a>
-                </div>
-
-                <div class="learning-card">
-                    <span class="learning-tag">SEO & Speed</span>
-                    <h3 class="learning-card-title">How Image Compression Boosts SEO</h3>
-                    <p class="learning-card-desc">Learn how compressing and converting your images to WebP directly enhances Core Web Vitals (LCP, CLS) and Google rankings.</p>
-                    <a href="guide-seo-speed.html" class="learning-link">
-                        <span>Read Guide</span>
-                        <svg viewBox="0 0 20 20" fill="currentColor" width="16" height="16">
-                            <path fill-rule="evenodd" d="M12.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-2.293-2.293a1 1 0 010-1.414z" clip-rule="evenodd" />
-                        </svg>
-                    </a>
-                </div>
-
-                <div class="learning-card">
-                    <span class="learning-tag">Privacy</span>
-                    <h3 class="learning-card-title">EXIF Metadata & Location Privacy</h3>
-                    <p class="learning-card-desc">Discover how camera files secretly embed GPS coordinates and camera serial numbers, and how to strip EXIF data offline.</p>
-                    <a href="blog-exif-metadata-privacy.html" class="learning-link">
-                        <span>Read Article</span>
-                        <svg viewBox="0 0 20 20" fill="currentColor" width="16" height="16">
-                            <path fill-rule="evenodd" d="M12.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-2.293-2.293a1 1 0 010-1.414z" clip-rule="evenodd" />
-                        </svg>
-                    </a>
-                </div>
-
+    <!-- ================= EDUCATIONAL GUIDES & LEARNING HUB ================= -->
+    <section class="section" aria-labelledby="guides-title">
+        <div class="learning-hub-head">
+            <div class="section-head">
+                <p class="eyebrow">Guides &amp; insights</p>
+                <h2 class="section-title" id="guides-title">Learn to ship <em>lighter</em> images.</h2>
             </div>
-            
-            <div style="text-align: center; margin-top: 2.5rem;">
-                <a href="blog.html" class="primary-btn" style="display: inline-flex; align-items: center; gap: 0.5rem; text-decoration: none; padding: 0.85rem 1.75rem; font-weight: 600;">
-                    <span>Explore All Optimization Guides & Articles</span>
-                    <span>→</span>
+            <a href="blog.html" class="btn btn-secondary">All articles <span aria-hidden="true">→</span></a>
+        </div>
+
+        <div class="learning-hub-grid">
+            <article class="learning-card">
+                <span class="learning-tag">File formats</span>
+                <h3 class="learning-card-title">WebP vs. JPEG: Format Showdown</h3>
+                <p class="learning-card-desc">Compare compression algorithms, 25–35% file size reductions, and Core Web Vitals performance between WebP and JPEG.</p>
+                <a href="blog-webp-vs-jpeg-comparison.html" class="learning-link">
+                    <span>Read article</span>
+                    <svg viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M12.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-2.293-2.293a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
                 </a>
+            </article>
+
+            <article class="learning-card">
+                <span class="learning-tag">Web optimization</span>
+                <h3 class="learning-card-title">Lossless vs. Lossy Image Compression</h3>
+                <p class="learning-card-desc">Understand quantization, data retention, and how the 75–82% quality sweet spot saves up to 80% bandwidth with zero visible blur.</p>
+                <a href="blog-image-compression-lossless-vs-lossy.html" class="learning-link">
+                    <span>Read article</span>
+                    <svg viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M12.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-2.293-2.293a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
+                </a>
+            </article>
+
+            <article class="learning-card">
+                <span class="learning-tag">File formats</span>
+                <h3 class="learning-card-title">Convert SVG to WebP &amp; PNG</h3>
+                <p class="learning-card-desc">Rasterize vector SVGs for OpenGraph previews, prevent Retina blur with DPR scaling, and eliminate XML injection risks.</p>
+                <a href="blog-svg-to-webp-png-conversion.html" class="learning-link">
+                    <span>Read article</span>
+                    <svg viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M12.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-2.293-2.293a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
+                </a>
+            </article>
+
+            <article class="learning-card">
+                <span class="learning-tag">Transparency</span>
+                <h3 class="learning-card-title">PNG to WebP with Alpha Channels</h3>
+                <p class="learning-card-desc">How WebP preserves full alpha transparency in both lossy and lossless modes, replacing bulky PNG files effortlessly.</p>
+                <a href="blog-png-to-webp-transparency.html" class="learning-link">
+                    <span>Read article</span>
+                    <svg viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M12.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-2.293-2.293a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
+                </a>
+            </article>
+
+            <article class="learning-card">
+                <span class="learning-tag">SEO &amp; speed</span>
+                <h3 class="learning-card-title">How Image Compression Boosts SEO</h3>
+                <p class="learning-card-desc">How compressing and converting images to WebP directly improves Core Web Vitals (LCP, CLS) and Google rankings.</p>
+                <a href="guide-seo-speed.html" class="learning-link">
+                    <span>Read guide</span>
+                    <svg viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M12.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-2.293-2.293a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
+                </a>
+            </article>
+
+            <article class="learning-card">
+                <span class="learning-tag">Privacy</span>
+                <h3 class="learning-card-title">EXIF Metadata &amp; Location Privacy</h3>
+                <p class="learning-card-desc">How camera files secretly embed GPS coordinates and serial numbers, and how to strip EXIF data offline.</p>
+                <a href="blog-exif-metadata-privacy.html" class="learning-link">
+                    <span>Read article</span>
+                    <svg viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M12.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-2.293-2.293a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
+                </a>
+            </article>
+        </div>
+
+        <!-- ================= CTA ================= -->
+        <div class="cta-band">
+            <div>
+                <h2 class="cta-title">Ready to make your images <em>lighter?</em></h2>
+                <p class="cta-text">Free, unlimited and private. No sign-up, no watermarks, no servers.</p>
             </div>
+            <a href="#main-content" class="btn btn-primary btn-lg">Start converting <span aria-hidden="true">↑</span></a>
         </div>
     </section>
 
     <!-- ================= SITE FOOTER ================= -->
     <footer class="site-footer">
         <div class="footer-container">
-            <div class="footer-logo">⇄ PicsConvert</div>
-            
-            <nav class="footer-nav">
-                <a href="about.html" class="footer-link">About Us</a>
+            <div class="footer-brand">
+                <a href="/" class="footer-logo">
+                    <span class="logo-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h13l-3.5-3.5"/><path d="M20 16H7l3.5 3.5"/></svg></span>
+                    <span>PicsConvert</span>
+                </a>
+                <p class="footer-tagline">Private, in-browser image conversion. Convert, resize and compress in bulk without your files ever leaving your device.</p>
+            </div>
+            <nav class="footer-col" aria-label="Product">
+                <p class="footer-heading">Product</p>
+                <a href="/" class="footer-link">Image Converter</a>
                 <a href="blog.html" class="footer-link">Blog</a>
-                <a href="privacy.html" class="footer-link">Privacy Policy</a>
-                <a href="terms.html" class="footer-link">Terms of Service</a>
+                <a href="about.html" class="footer-link">About Us</a>
                 <a href="contact.html" class="footer-link">Contact Us</a>
             </nav>
-            
+            <nav class="footer-col" aria-label="Guides">
+                <p class="footer-heading">Guides</p>
+                <a href="guide-image-formats.html" class="footer-link">Image Formats</a>
+                <a href="guide-seo-speed.html" class="footer-link">SEO &amp; Speed</a>
+                <a href="guide-local-privacy.html" class="footer-link">Local Privacy</a>
+                <a href="guide-bulk-resizing.html" class="footer-link">Bulk Resizing</a>
+            </nav>
+            <nav class="footer-col" aria-label="Legal">
+                <p class="footer-heading">Legal</p>
+                <a href="privacy.html" class="footer-link">Privacy Policy</a>
+                <a href="terms.html" class="footer-link">Terms of Service</a>
+            </nav>
+        </div>
+        <div class="footer-bottom">
             <p class="footer-text">Copyright &copy; 2026 PicsConvert. All processing happens entirely inside your web browser. No files are saved on servers.</p>
+            <p class="footer-text footer-text-mono">0 bytes uploaded</p>
         </div>
     </footer>
 

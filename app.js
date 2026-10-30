@@ -144,16 +144,19 @@ if (formatSelect) {
     });
 }
 
+const LOCK_ICON_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>';
+const UNLOCK_ICON_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 7.75-1.4"/></svg>';
+
 if (aspectLockBtn) {
     aspectLockBtn.addEventListener('click', () => {
         aspectLocked = !aspectLocked;
         if (aspectLocked) {
             aspectLockBtn.classList.add('locked');
-            aspectLockBtn.innerText = '🔒';
+            aspectLockBtn.innerHTML = LOCK_ICON_SVG;
             aspectLockBtn.title = 'Lock Aspect Ratio (Proportional)';
         } else {
             aspectLockBtn.classList.remove('locked');
-            aspectLockBtn.innerText = '🔓';
+            aspectLockBtn.innerHTML = UNLOCK_ICON_SVG;
             aspectLockBtn.title = 'Unlock Aspect Ratio (Free Resizing)';
         }
         
@@ -179,6 +182,14 @@ if (heightInput) {
 if (dropZone && fileInput) {
     // Click triggers hidden input
     dropZone.addEventListener('click', () => fileInput.click());
+
+    // Keyboard access (drop zone is focusable with role="button")
+    dropZone.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            fileInput.click();
+        }
+    });
 
     // Drag-and-drop animations
     dropZone.addEventListener('dragover', (e) => {
@@ -288,7 +299,7 @@ function addFilesToQueue(files) {
     if (files.length === 0) return;
 
     // Show Stats Panel & Buttons
-    if (statsPanel) statsPanel.style.display = 'flex';
+    if (statsPanel) statsPanel.style.display = 'grid';
     if (clearBtn) clearBtn.disabled = false;
 
     Array.from(files).forEach(file => {
@@ -343,12 +354,12 @@ function createPreviewCardElement(item) {
     const col = document.createElement('div');
     col.className = 'preview-card';
     col.id = `card_${item.id}`;
+    col.dataset.state = 'pending';
 
     col.innerHTML = `
         <div class="preview-card-image-wrap">
             <div class="card-loader" id="loader_${item.id}">
                 <div class="spinner"></div>
-                <span class="drop-subtitle">Optimizing...</span>
             </div>
             <img id="img_${item.id}" src="" style="display: none;" alt="Preview image">
         </div>
@@ -360,17 +371,19 @@ function createPreviewCardElement(item) {
             <div class="size-comparison" id="sizes_${item.id}">
                 <span>Waiting in queue...</span>
             </div>
-            <div class="card-actions">
-                <button class="card-btn card-btn-download" id="dl_${item.id}" disabled>
-                    <span>Download</span>
-                </button>
-                <button class="card-btn card-btn-compare" id="comp_${item.id}" style="display: none;">
-                    <span>Compare</span>
-                </button>
-                <button class="card-btn card-btn-delete" onclick="removeItemFromQueue('${item.id}')" title="Remove File">
-                    &times;
-                </button>
-            </div>
+        </div>
+        <div class="savings-value" id="savings_${item.id}" aria-label="Size change"></div>
+        <div class="card-actions">
+            <button class="card-btn card-btn-compare" id="comp_${item.id}" style="display: none;" title="Compare before/after" aria-label="Compare before and after">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v18"/><rect x="3" y="3" width="18" height="18" rx="2"/><path d="m8 9-3 3 3 3M16 9l3 3-3 3"/></svg>
+            </button>
+            <button class="card-btn card-btn-download" id="dl_${item.id}" disabled title="Download file">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+                <span>Download</span>
+            </button>
+            <button class="card-btn card-btn-delete" onclick="removeItemFromQueue('${item.id}')" title="Remove file" aria-label="Remove file">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg>
+            </button>
         </div>
     `;
 
@@ -543,13 +556,9 @@ function markItemAsFailed(item, errorText) {
     if (loader) loader.style.opacity = '0';
     setTimeout(() => { if (loader) loader.style.display = 'none'; }, 200);
 
-    if (badge) {
-        badge.innerText = "FAILED";
-        badge.style.backgroundColor = "var(--danger-light)";
-        badge.style.color = "var(--danger)";
-    }
+    if (badge) badge.innerText = "Failed";
     if (sizes) sizes.innerText = errorText;
-    if (card) card.style.borderColor = "var(--danger)";
+    if (card) card.dataset.state = 'error';
 
     finalizeLoopStep();
 }
@@ -576,34 +585,26 @@ function renderConversionSuccessUI(item) {
     }
 
     // Set Format Badge
-    const currentExt = formatSelect.value.toUpperCase();
-    if (badge) {
-        badge.innerText = currentExt;
-        badge.style.backgroundColor = "var(--success-light)";
-        badge.style.color = "var(--success)";
-    }
+    if (card) card.dataset.state = 'done';
+    if (badge) badge.innerText = formatSelect.value.toUpperCase();
 
     // Display Exact Binary size comparison
     const sizeBeforeKB = (item.originalSize / 1024).toFixed(1);
     const sizeAfterKB = (item.compressedSize / 1024).toFixed(1);
     const savings = Math.round((1 - (item.compressedSize / item.originalSize)) * 100);
+    const barWidth = Math.min(100, Math.max(2, (item.compressedSize / item.originalSize) * 100));
 
     if (sizes) {
-        let savingsBadgeHTML = '';
-        if (savings > 0) {
-            savingsBadgeHTML = `<span class="savings-badge">Saved ${savings}%</span>`;
-        } else if (savings < 0) {
-            savingsBadgeHTML = `<span class="savings-badge negative">Bloat +${Math.abs(savings)}%</span>`;
-        } else {
-            savingsBadgeHTML = `<span class="savings-badge" style="background-color: var(--border); color: var(--text-secondary);">0% Change</span>`;
-        }
-
         sizes.innerHTML = `
-            <div style="display:flex; flex-direction:column; gap:0.25rem; width:100%;">
-                <div>${sizeBeforeKB} KB → <strong>${sizeAfterKB} KB</strong></div>
-                <div>${savingsBadgeHTML}</div>
-            </div>
+            <div class="size-line"><span>${sizeBeforeKB} KB</span><span class="size-arrow">→</span><strong>${sizeAfterKB} KB</strong></div>
+            <div class="size-bar${savings < 0 ? ' is-larger' : ''}"><span style="width: ${barWidth}%"></span></div>
         `;
+    }
+
+    const savingsEl = document.getElementById(`savings_${item.id}`);
+    if (savingsEl) {
+        savingsEl.className = 'savings-value' + (savings > 0 ? ' is-positive' : savings < 0 ? ' is-negative' : '');
+        savingsEl.innerText = savings > 0 ? `−${savings}%` : savings < 0 ? `+${Math.abs(savings)}%` : '0%';
     }
 
     // Bind individual actions
@@ -778,11 +779,11 @@ function reprocessAllImages() {
             loader.style.opacity = '1';
         }
         if (imgEl) imgEl.style.display = 'none';
-        if (badge) {
-            badge.innerText = "Recoding...";
-            badge.style.backgroundColor = "var(--bg-base)";
-            badge.style.color = "var(--text-secondary)";
-        }
+        const card = document.getElementById(`card_${item.id}`);
+        const savingsEl = document.getElementById(`savings_${item.id}`);
+        if (card) card.dataset.state = 'pending';
+        if (savingsEl) { savingsEl.className = 'savings-value'; savingsEl.innerText = ''; }
+        if (badge) badge.innerText = "Recoding";
         if (sizes) sizes.innerHTML = "<span>Queued...</span>";
         if (dlBtn) dlBtn.disabled = true;
         if (compBtn) compBtn.style.display = 'none';

@@ -30,53 +30,13 @@
     <link rel="shortcut icon" href="images/favicon.ico">
     
     <!-- Custom CSS Styles -->
+    <script>(function(){try{var m=localStorage.getItem('themeMode')||'system';if(m==='dark'||(m==='system'&&window.matchMedia('(prefers-color-scheme: dark)').matches)){document.documentElement.classList.add('dark');}}catch(e){}})();</script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&display=swap">
     <link rel="stylesheet" href="styles.css">
     
     <!-- Blog Specific Style Tweaks -->
-    <style>
-        .blog-cover-wrapper {
-            width: 100%;
-            margin-bottom: 2rem;
-            border-radius: var(--radius-md);
-            overflow: hidden;
-            border: 1px solid var(--border);
-            box-shadow: var(--shadow);
-        }
-        .blog-cover-img {
-            width: 100%;
-            height: auto;
-            max-height: 450px;
-            object-fit: cover;
-            display: block;
-        }
-        .compliance-card p strong {
-            color: var(--text-primary);
-        }
-        .code-block-container {
-            background-color: var(--bg-surface-elevated);
-            border: 1px solid var(--border);
-            border-radius: var(--radius-sm);
-            padding: 1.25rem;
-            margin: 1.5rem 0;
-            font-family: monospace;
-            font-size: 0.9rem;
-            overflow-x: auto;
-            color: var(--text-primary);
-        }
-        .text-accent {
-            color: var(--primary);
-            font-weight: 600;
-        }
-        .matrix-winner {
-            background-color: var(--success-light);
-            color: var(--success);
-            padding: 0.15rem 0.5rem;
-            border-radius: 12px;
-            font-size: 0.75rem;
-            font-weight: 700;
-            text-transform: uppercase;
-        }
-    </style>
 
     <!-- JSON-LD Structured Data Schema -->
     <script type="application/ld+json">
@@ -113,29 +73,29 @@
     <!-- ================= SITE HEADER ================= -->
     <header class="site-header">
         <div class="nav-container">
-            <a href="/" class="logo-link">
-                <div class="logo-icon">⇄</div>
+            <a href="/" class="logo-link" aria-label="PicsConvert home">
+                <span class="logo-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h13l-3.5-3.5"/><path d="M20 16H7l3.5 3.5"/></svg></span>
                 <span>PicsConvert</span>
             </a>
-            
-            <nav>
+
+            <nav class="site-nav" aria-label="Primary">
                 <ul class="nav-menu">
-                    <li><a href="/" class="nav-link">Home</a></li>
-                    <li><a href="blog.html" class="nav-link active">Blog</a></li>
+                    <li><a href="/" class="nav-link">Converter</a></li>
+                    <li><a href="blog.html" class="nav-link active" aria-current="page">Blog</a></li>
                     <li><a href="about.html" class="nav-link">About</a></li>
                     <li><a href="contact.html" class="nav-link">Contact</a></li>
                 </ul>
             </nav>
 
-            <div class="theme-selector">
-                <button class="theme-btn active" onclick="setThemeMode('system')" id="systemBtn">
-                    💻 <span class="d-none-sm">System</span>
+            <div class="theme-selector" role="group" aria-label="Color theme">
+                <button class="theme-btn active" onclick="setThemeMode('system')" id="systemBtn" title="System theme" aria-label="System theme">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
                 </button>
-                <button class="theme-btn" onclick="setThemeMode('light')" id="lightBtn">
-                    ☀️ <span class="d-none-sm">Light</span>
+                <button class="theme-btn" onclick="setThemeMode('light')" id="lightBtn" title="Light theme" aria-label="Light theme">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
                 </button>
-                <button class="theme-btn" onclick="setThemeMode('dark')" id="darkBtn">
-                    🌙 <span class="d-none-sm">Dark</span>
+                <button class="theme-btn" onclick="setThemeMode('dark')" id="darkBtn" title="Dark theme" aria-label="Dark theme">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
                 </button>
             </div>
         </div>
@@ -144,7 +104,7 @@
     <!-- ================= COMPLIANCE/ARTICLE BODY ================= -->
     <main class="compliance-wrapper">
         <article class="compliance-card">
-            <h1 class="compliance-title" style="font-size: 2.2rem; line-height: 1.2;">AVIF vs. WebP in 2026: The Ultimate Next-Gen Image Format Showdown</h1>
+            <h1 class="compliance-title">AVIF vs. WebP in 2026: The Ultimate Next-Gen Image Format Showdown</h1>
             <div class="compliance-meta">Category: File Formats • Last Updated: June 2026</div>
 
             <!-- Cover Image -->
@@ -210,13 +170,13 @@
                             <td><strong>Encoding Speed</strong></td>
                             <td>Slow (highly CPU-intensive)</td>
                             <td>Fast (low CPU overhead)</td>
-                            <td><span class="matrix-winner" style="background-color: var(--primary-light); color: var(--primary);">WebP</span></td>
+                            <td><span class="matrix-winner">WebP</span></td>
                         </tr>
                         <tr>
                             <td><strong>Global Browser Support</strong></td>
                             <td>~95% (Broad Support)</td>
                             <td>~98.5% (Universal)</td>
-                            <td><span class="matrix-winner" style="background-color: var(--primary-light); color: var(--primary);">WebP</span></td>
+                            <td><span class="matrix-winner">WebP</span></td>
                         </tr>
                     </tbody>
                 </table>
@@ -261,15 +221,36 @@
     <!-- ================= SITE FOOTER ================= -->
     <footer class="site-footer">
         <div class="footer-container">
-            <div class="footer-logo">⇄ PicsConvert</div>
-            <nav class="footer-nav">
-                <a href="about.html" class="footer-link">About Us</a>
+            <div class="footer-brand">
+                <a href="/" class="footer-logo">
+                    <span class="logo-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h13l-3.5-3.5"/><path d="M20 16H7l3.5 3.5"/></svg></span>
+                    <span>PicsConvert</span>
+                </a>
+                <p class="footer-tagline">Private, in-browser image conversion. Convert, resize and compress in bulk without your files ever leaving your device.</p>
+            </div>
+            <nav class="footer-col" aria-label="Product">
+                <p class="footer-heading">Product</p>
+                <a href="/" class="footer-link">Image Converter</a>
                 <a href="blog.html" class="footer-link">Blog</a>
-                <a href="privacy.html" class="footer-link">Privacy Policy</a>
-                <a href="terms.html" class="footer-link">Terms of Service</a>
+                <a href="about.html" class="footer-link">About Us</a>
                 <a href="contact.html" class="footer-link">Contact Us</a>
             </nav>
+            <nav class="footer-col" aria-label="Guides">
+                <p class="footer-heading">Guides</p>
+                <a href="guide-image-formats.html" class="footer-link">Image Formats</a>
+                <a href="guide-seo-speed.html" class="footer-link">SEO &amp; Speed</a>
+                <a href="guide-local-privacy.html" class="footer-link">Local Privacy</a>
+                <a href="guide-bulk-resizing.html" class="footer-link">Bulk Resizing</a>
+            </nav>
+            <nav class="footer-col" aria-label="Legal">
+                <p class="footer-heading">Legal</p>
+                <a href="privacy.html" class="footer-link">Privacy Policy</a>
+                <a href="terms.html" class="footer-link">Terms of Service</a>
+            </nav>
+        </div>
+        <div class="footer-bottom">
             <p class="footer-text">Copyright &copy; 2026 PicsConvert. All processing happens entirely inside your web browser. No files are saved on servers.</p>
+            <p class="footer-text footer-text-mono">0 bytes uploaded</p>
         </div>
     </footer>
 
