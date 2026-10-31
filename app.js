@@ -93,6 +93,50 @@ applyActiveTheme();
 highlightThemeButtons();
 
 // ==========================================================================
+// 1b. NAV DROPDOWN (Shared Across All Pages)
+// ==========================================================================
+
+function initNavDropdowns() {
+    const dropdowns = document.querySelectorAll('.nav-dropdown');
+    if (!dropdowns.length) return;
+
+    const setOpen = (dropdown, open) => {
+        dropdown.classList.toggle('open', open);
+        dropdown.querySelector('.nav-dropdown-toggle').setAttribute('aria-expanded', String(open));
+    };
+
+    dropdowns.forEach(dropdown => {
+        const toggle = dropdown.querySelector('.nav-dropdown-toggle');
+        toggle.addEventListener('click', (e) => {
+            e.stopPropagation();
+            setOpen(dropdown, !dropdown.classList.contains('open'));
+        });
+        // Close when keyboard focus leaves the menu
+        dropdown.addEventListener('focusout', (e) => {
+            if (!dropdown.contains(e.relatedTarget)) setOpen(dropdown, false);
+        });
+    });
+
+    document.addEventListener('click', (e) => {
+        dropdowns.forEach(dropdown => {
+            if (!dropdown.contains(e.target)) setOpen(dropdown, false);
+        });
+    });
+
+    document.addEventListener('keydown', (e) => {
+        if (e.key !== 'Escape') return;
+        dropdowns.forEach(dropdown => {
+            if (dropdown.classList.contains('open')) {
+                setOpen(dropdown, false);
+                dropdown.querySelector('.nav-dropdown-toggle').focus();
+            }
+        });
+    });
+}
+
+initNavDropdowns();
+
+// ==========================================================================
 // 2. COMPLIANCE & ACCORDION EVENTS (Shared & Safe)
 // ==========================================================================
 
