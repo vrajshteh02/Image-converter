@@ -346,6 +346,38 @@ code {
     padding-top: 0.7rem;
 }
 
+/* Tool groups: stacked on phones, side by side on wider screens */
+.nav-dropdown-group {
+    display: flex;
+    flex-direction: column;
+}
+.nav-dropdown-group + .nav-dropdown-group .nav-dropdown-heading {
+    margin-top: 0.25rem;
+    border-top: 1px solid var(--border);
+    padding-top: 0.7rem;
+}
+@media (min-width: 721px) {
+    .nav-dropdown-panel {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(160px, auto));
+        column-gap: 0.25rem;
+    }
+    .nav-dropdown-group + .nav-dropdown-group .nav-dropdown-heading {
+        margin-top: 0;
+        border-top: 0;
+        padding-top: 0.5rem;
+    }
+    .nav-dropdown-all {
+        grid-column: 1 / -1;
+    }
+}
+@media (max-width: 720px) {
+    .nav-dropdown-panel {
+        max-height: calc(100vh - 7rem);
+        overflow-y: auto;
+    }
+}
+
 .nav-dropdown-link,
 .nav-dropdown-all {
     font-size: 0.9rem;
@@ -2404,6 +2436,11 @@ textarea.form-input {
     font-size: 0.95rem;
     font-weight: 500;
 }
+.contact-alert-error {
+    background: var(--danger-light);
+    color: var(--danger);
+    border: 1px solid color-mix(in srgb, var(--danger) 35%, transparent);
+}
 .contact-alert-success {
     background: var(--success-light);
     color: var(--success);
@@ -3233,4 +3270,155 @@ textarea.form-input {
         transition-duration: 0.01ms !important;
         scroll-behavior: auto !important;
     }
+}
+
+/* ================= VIDEO TOOLS (video-tools.js) ================= */
+.video-workspace {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+.video-stage {
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    background: #000;
+    overflow: hidden;
+}
+.video-stage video,
+.video-result-media video {
+    display: block;
+    width: 100%;
+    max-height: 420px;
+    background: #000;
+}
+.video-preview-note {
+    padding: 2.5rem 1.25rem;
+    text-align: center;
+    color: #cfcabe;
+    font-size: 0.9rem;
+}
+.video-meta-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+}
+.video-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem 0.9rem;
+    min-width: 0;
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    color: var(--text-tertiary);
+}
+.video-meta strong {
+    font-family: var(--font-body);
+    font-size: 0.92rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    overflow-wrap: anywhere;
+    flex-basis: 100%;
+}
+.video-progress {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    padding: 1rem 1.1rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    background: var(--bg-surface-elevated);
+}
+.video-progress-track {
+    height: 8px;
+    border-radius: 999px;
+    background: var(--border);
+    overflow: hidden;
+}
+.video-progress-track span {
+    display: block;
+    height: 100%;
+    width: 0;
+    border-radius: inherit;
+    background: var(--primary);
+    transition: width 0.3s ease;
+}
+.video-progress-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+}
+.video-progress-row .btn {
+    padding: 0.45rem 0.85rem;
+    font-size: 0.82rem;
+}
+.video-result {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    padding: 1.1rem;
+    border: 1px solid color-mix(in srgb, var(--success) 40%, var(--border));
+    border-radius: var(--radius-md);
+    background: var(--bg-surface-elevated);
+}
+.video-result-media {
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+}
+.video-result-media img {
+    display: block;
+    max-width: 100%;
+    max-height: 420px;
+    margin: 0 auto;
+    border-radius: var(--radius-sm);
+}
+.video-result-media audio {
+    width: 100%;
+}
+.video-result-name {
+    font-weight: 600;
+    overflow-wrap: anywhere;
+}
+.video-result-sizes {
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    font-family: var(--font-mono);
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+}
+.video-result-sizes .savings-value {
+    min-width: 0;
+    margin-left: auto;
+}
+.check-row {
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+    font-size: 0.88rem;
+    color: var(--text-primary);
+    cursor: pointer;
+}
+.check-row input {
+    width: 16px;
+    height: 16px;
+    accent-color: var(--primary);
+}
+.timeline-row {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+.timeline-row .range-slider {
+    flex: 1;
+}
+.range-slider:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
 }

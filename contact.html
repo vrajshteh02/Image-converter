@@ -56,16 +56,28 @@
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
                         </button>
                         <div class="nav-dropdown-panel" id="toolsMenu">
-                            <p class="nav-dropdown-heading">PDF tools</p>
-                            <a href="pdf-editor.html" class="nav-dropdown-link">PDF Editor</a>
-                            <a href="image-to-pdf.html" class="nav-dropdown-link">Image to PDF</a>
-                            <a href="pdf-to-image.html" class="nav-dropdown-link">PDF to Image</a>
-                            <a href="merge-pdf.html" class="nav-dropdown-link">Merge PDF</a>
-                            <a href="split-pdf.html" class="nav-dropdown-link">Split PDF</a>
-                            <p class="nav-dropdown-heading">Image tools</p>
-                            <a href="image-converter.html" class="nav-dropdown-link">Image Converter</a>
-                            <a href="compress-image.html" class="nav-dropdown-link">Compress Image</a>
-                            <a href="resize-image.html" class="nav-dropdown-link">Resize Image</a>
+                            <div class="nav-dropdown-group">
+                                <p class="nav-dropdown-heading">PDF tools</p>
+                                <a href="pdf-editor.html" class="nav-dropdown-link">PDF Editor</a>
+                                <a href="image-to-pdf.html" class="nav-dropdown-link">Image to PDF</a>
+                                <a href="pdf-to-image.html" class="nav-dropdown-link">PDF to Image</a>
+                                <a href="merge-pdf.html" class="nav-dropdown-link">Merge PDF</a>
+                                <a href="split-pdf.html" class="nav-dropdown-link">Split PDF</a>
+                            </div>
+                            <div class="nav-dropdown-group">
+                                <p class="nav-dropdown-heading">Image tools</p>
+                                <a href="image-converter.html" class="nav-dropdown-link">Image Converter</a>
+                                <a href="compress-image.html" class="nav-dropdown-link">Compress Image</a>
+                                <a href="resize-image.html" class="nav-dropdown-link">Resize Image</a>
+                            </div>
+                            <div class="nav-dropdown-group">
+                                <p class="nav-dropdown-heading">Video tools</p>
+                                <a href="compress-video.html" class="nav-dropdown-link">Compress Video</a>
+                                <a href="video-converter.html" class="nav-dropdown-link">Video Converter</a>
+                                <a href="video-to-mp3.html" class="nav-dropdown-link">Video to MP3</a>
+                                <a href="video-to-gif.html" class="nav-dropdown-link">Video to GIF</a>
+                                <a href="trim-video.html" class="nav-dropdown-link">Trim Video</a>
+                            </div>
                             <a href="/" class="nav-dropdown-all">View all tools &rarr;</a>
                         </div>
                     </li>
@@ -93,28 +105,34 @@
     <main class="compliance-wrapper">
         <article class="compliance-card">
             <h1 class="compliance-title">Contact Us</h1>
-            <p class="lede">
-                Have any questions, bug reports, or feature suggestions? Send us a message below, or email us directly at <a href="mailto:support@picsconvert.com">support@picsconvert.com</a>. Our support team typically responds within 24 hours.
+            <p class="lede" id="contactIntro">
+                Have any questions, bug reports, or feature suggestions? Send us a message below and our support team will get back to you, typically within 24 hours.
             </p>
 
             <div class="contact-alert contact-alert-success" id="contactSuccess">
                 🎉 Your message has been sent successfully! Thank you for contacting PicsConvert.
             </div>
+            <div class="contact-alert contact-alert-error" id="contactError" role="alert">
+                Sorry, your message could not be sent. Please check your internet connection and try again.
+            </div>
 
             <form class="contact-form" id="contactForm" onsubmit="handleContactSubmit(event)">
+                <!-- Spam trap: hidden from people, bots fill it in -->
+                <input type="text" name="website" id="contact-website" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0;">
+
                 <div class="setting-group">
                     <label for="contact-name" class="setting-label">Full Name</label>
-                    <input type="text" id="contact-name" class="form-input" placeholder="John Doe" required>
+                    <input type="text" id="contact-name" name="name" maxlength="100" class="form-input" placeholder="John Doe" required>
                 </div>
 
                 <div class="setting-group">
                     <label for="contact-email" class="setting-label">Email Address</label>
-                    <input type="email" id="contact-email" class="form-input" placeholder="john@example.com" required>
+                    <input type="email" id="contact-email" name="email" maxlength="200" class="form-input" placeholder="john@example.com" required>
                 </div>
 
                 <div class="setting-group">
                     <label for="contact-subject" class="setting-label">Subject</label>
-                    <select id="contact-subject" class="form-select" required>
+                    <select id="contact-subject" name="subject" class="form-select" required>
                         <option value="" disabled selected>Select an option</option>
                         <option value="General Inquiry">General Inquiry</option>
                         <option value="Feature Request">Feature Request</option>
@@ -125,10 +143,10 @@
 
                 <div class="setting-group">
                     <label for="contact-message" class="setting-label">Your Message</label>
-                    <textarea id="contact-message" class="form-input" rows="5" placeholder="Write your message here..." required></textarea>
+                    <textarea id="contact-message" name="message" maxlength="5000" class="form-input" rows="5" placeholder="Write your message here..." required></textarea>
                 </div>
 
-                <button type="submit" class="btn btn-primary">
+                <button type="submit" class="btn btn-primary" id="contactSubmit">
                     <span>Send Message</span>
                 </button>
             </form>
@@ -161,6 +179,11 @@
                 <a href="split-pdf.html" class="footer-link">Split PDF</a>
                 <a href="compress-image.html" class="footer-link">Compress Image</a>
                 <a href="resize-image.html" class="footer-link">Resize Image</a>
+                <a href="compress-video.html" class="footer-link">Compress Video</a>
+                <a href="video-converter.html" class="footer-link">Video Converter</a>
+                <a href="video-to-mp3.html" class="footer-link">Video to MP3</a>
+                <a href="video-to-gif.html" class="footer-link">Video to GIF</a>
+                <a href="trim-video.html" class="footer-link">Trim Video</a>
             </nav>
             <nav class="footer-col" aria-label="Guides">
                 <p class="footer-heading">Guides</p>
@@ -183,10 +206,45 @@
 
     <script src="app.js"></script>
     <script>
-        function handleContactSubmit(event) {
+        // Google Apps Script web app that appends each message to the Google Sheet.
+        // Paste the "/exec" URL from Deploy > Manage deployments here.
+        const CONTACT_SHEET_URL = 'https://script.google.com/macros/s/AKfycbzAWCSkpw_oaH6lgDlt7Bmj4wZV2dlHqZp9diNHqJeR-WYgeTlPbUmO_R4BwiPD_QSu/exec';
+
+        async function handleContactSubmit(event) {
             event.preventDefault();
-            // Client-side visual validation
+            const form = document.getElementById('contactForm');
+            const button = document.getElementById('contactSubmit');
+            const errorBox = document.getElementById('contactError');
+            errorBox.style.display = 'none';
+
+            // Bots fill the hidden field; pretend it worked and send nothing
+            if (form.elements.website.value) return showContactSuccess();
+
+            const data = new URLSearchParams({
+                name: form.elements.name.value.trim(),
+                email: form.elements.email.value.trim(),
+                subject: form.elements.subject.value,
+                message: form.elements.message.value.trim(),
+                page: location.href
+            });
+
+            button.disabled = true;
+            button.querySelector('span').innerText = 'Sending...';
+            try {
+                // Apps Script does not send CORS headers on its redirect, so the reply is opaque.
+                // The request still reaches the sheet; only a network failure throws here.
+                await fetch(CONTACT_SHEET_URL, { method: 'POST', mode: 'no-cors', body: data });
+                showContactSuccess();
+            } catch (err) {
+                errorBox.style.display = 'block';
+                button.disabled = false;
+                button.querySelector('span').innerText = 'Send Message';
+            }
+        }
+
+        function showContactSuccess() {
             document.getElementById('contactForm').style.display = 'none';
+            document.getElementById('contactIntro').style.display = 'none';
             document.getElementById('contactSuccess').style.display = 'block';
         }
     </script>
