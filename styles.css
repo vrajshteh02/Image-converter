@@ -1061,6 +1061,35 @@ textarea.form-input {
     display: none;
 }
 
+/* Pagination under long image lists */
+.list-pager {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 0.35rem;
+    margin-top: 0.75rem;
+}
+.list-pager[hidden],
+.preview-card[hidden] {
+    display: none;
+}
+.list-pager .chip-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+.list-pager-gap {
+    color: var(--text-tertiary);
+    padding: 0 0.15rem;
+}
+.list-pager-info {
+    flex-basis: 100%;
+    text-align: center;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--text-tertiary);
+}
+
 .preview-card {
     position: relative;
     display: grid;

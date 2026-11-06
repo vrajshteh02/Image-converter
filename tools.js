@@ -273,6 +273,48 @@ function createImageBatch({ listEl, statusEl, statsEl, downloadAllBtn, clearBtn,
     let items = [];
     let running = false;
     let generation = 0;
+    let page = 0;
+    const PAGE_SIZE = 5;
+
+    // Pager shown under the list once there are more than PAGE_SIZE images
+    const pager = document.createElement('nav');
+    pager.className = 'list-pager';
+    pager.setAttribute('aria-label', 'Image list pages');
+    pager.hidden = true;
+    listEl.after(pager);
+    pager.addEventListener('click', e => {
+        const btn = e.target.closest('button[data-page]');
+        if (!btn || btn.disabled) return;
+        page = Number(btn.dataset.page);
+        renderPage();
+        listEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    });
+
+    function renderPage() {
+        const pages = Math.max(1, Math.ceil(items.length / PAGE_SIZE));
+        page = Math.min(page, pages - 1);
+        items.forEach((item, i) => {
+            item.card.hidden = Math.floor(i / PAGE_SIZE) !== page;
+        });
+        pager.hidden = pages <= 1;
+        if (pager.hidden) { pager.innerHTML = ''; return; }
+        const btn = (label, target, opts = {}) =>
+            `<button type="button" class="chip-btn${opts.active ? ' active' : ''}" data-page="${target}"${opts.disabled ? ' disabled' : ''}${opts.active ? ' aria-current="page"' : ''}${opts.aria ? ` aria-label="${opts.aria}"` : ''}>${label}</button>`;
+        // Show first, last and pages near the current one, with gaps as ellipses
+        const shown = [];
+        for (let p = 0; p < pages; p++) {
+            if (p === 0 || p === pages - 1 || Math.abs(p - page) <= 1) shown.push(p);
+        }
+        let html = btn('‹ Prev', page - 1, { disabled: page === 0, aria: 'Previous page' });
+        shown.forEach((p, i) => {
+            if (i && p - shown[i - 1] > 1) html += '<span class="list-pager-gap">…</span>';
+            html += btn(p + 1, p, { active: p === page, aria: `Page ${p + 1}` });
+        });
+        html += btn('Next ›', page + 1, { disabled: page === pages - 1, aria: 'Next page' });
+        const start = page * PAGE_SIZE;
+        html += `<span class="list-pager-info">${start + 1}–${Math.min(start + PAGE_SIZE, items.length)} of ${items.length}</span>`;
+        pager.innerHTML = html;
+    }
 
     function refresh() {
         const done = items.filter(i => i.result);
@@ -320,10 +362,12 @@ function createImageBatch({ listEl, statusEl, statsEl, downloadAllBtn, clearBtn,
             item.card = createResultCard(listEl, item, removed => {
                 URL.revokeObjectURL(removed.thumbUrl);
                 items = items.filter(i => i !== removed);
+                renderPage();
                 refresh();
             });
             items.push(item);
         });
+        renderPage();
         run();
     }
 
@@ -338,7 +382,9 @@ function createImageBatch({ listEl, statusEl, statsEl, downloadAllBtn, clearBtn,
         generation++;
         items.forEach(i => URL.revokeObjectURL(i.thumbUrl));
         items = [];
+        page = 0;
         listEl.innerHTML = "";
+        renderPage();
         refresh();
     }
 
@@ -375,10 +421,19 @@ function debounce(fn, wait) {
     const targetWrap = document.getElementById('compressTargetWrap');
     let mode = 'quality';
 
+    // Canvas can only save PNG losslessly, so PNGs are shrunk by reducing the colour palette (like TinyPNG)
+    async function encodeCompressed(canvas, mime, quality) {
+        if (mime !== 'image/png' || !window.UPNG) return canvasToBlob(canvas, mime, quality);
+        const data = canvas.getContext('2d').getImageData(0, 0, canvas.width, canvas.height).data;
+        const colors = Math.round(16 + clampValue(quality, 0, 1) * 240);
+        const png = window.UPNG.encode([data.buffer], canvas.width, canvas.height, colors);
+        return new Blob([png], { type: 'image/png' });
+    }
+
     async function compress(item) {
         const file = item.file;
-        // PNG and others have no quality setting on canvas, so "auto" re-encodes them as WebP
-        const choice = formatEl.value === 'auto' ? (file.type === 'image/jpeg' ? 'jpeg' : 'webp') : formatEl.value;
+        // "auto" keeps the original format (JPG stays JPG, PNG stays PNG, WebP stays WebP)
+        const choice = formatEl.value === 'auto' ? 'original' : formatEl.value;
         const mime = await resolveOutputMime(choice, file);
         const background = mime === 'image/jpeg' ? '#ffffff' : null;
         const { img, url } = await loadImageFile(file);
@@ -389,26 +444,26 @@ function debounce(fn, wait) {
             let blob;
 
             if (mode === 'quality') {
-                blob = await canvasToBlob(canvas, mime, parseFloat(qualityEl.value));
+                blob = await encodeCompressed(canvas, mime, parseFloat(qualityEl.value));
             } else {
                 const target = Math.max(5, parseFloat(targetEl.value) || 100) * 1024;
                 // Binary-search the quality; shrink dimensions only if even the lowest quality is too big
                 for (let attempt = 0; attempt < 8 && !blob; attempt++) {
                     let lo = 0.05, hi = 0.92, best = null;
-                    const top = await canvasToBlob(canvas, mime, hi);
+                    const top = await encodeCompressed(canvas, mime, hi);
                     if (top.size <= target) {
                         best = top;
                     } else {
                         for (let i = 0; i < 7; i++) {
                             const q = (lo + hi) / 2;
-                            const attemptBlob = await canvasToBlob(canvas, mime, q);
+                            const attemptBlob = await encodeCompressed(canvas, mime, q);
                             if (attemptBlob.size <= target) { best = attemptBlob; lo = q; } else hi = q;
                         }
                     }
                     if (best) {
                         blob = best;
                     } else {
-                        const floor = await canvasToBlob(canvas, mime, 0.05);
+                        const floor = await encodeCompressed(canvas, mime, 0.05);
                         const factor = clampValue(Math.sqrt(target / floor.size) * 0.95, 0.4, 0.9);
                         w = Math.max(1, Math.round(w * factor));
                         h = Math.max(1, Math.round(h * factor));

@@ -154,11 +154,12 @@
                         <span>Output format</span>
                     </label>
                     <select id="compressFormat" class="form-select">
-                        <option value="auto">Auto (best size)</option>
+                        <option value="auto">Same as original</option>
                         <option value="jpeg">JPEG (works everywhere)</option>
+                        <option value="png">PNG (keeps transparency)</option>
                         <option value="webp">WebP (smallest)</option>
                     </select>
-                    <p class="setting-hint">Auto keeps JPEGs as JPEG and turns PNGs into WebP, which keeps transparency.</p>
+                    <p class="setting-hint">By default a JPG stays JPG, a PNG stays PNG and a WebP stays WebP.</p>
                 </div>
 
                 <p class="settings-note">
@@ -288,12 +289,12 @@
                 </div>
                 <div class="faq-item">
                     <button class="faq-trigger" onclick="toggleFaq(this)">
-                        <span>Why does my PNG turn into WebP?</span>
+                        <span>Will my PNG stay a PNG?</span>
                         <span class="faq-icon" aria-hidden="true">▼</span>
                     </button>
                     <div class="faq-content">
                         <div class="faq-content-inner">
-                            Browsers can only save PNG losslessly, so a "compressed" PNG would barely shrink. In Auto mode PNGs are saved as WebP, which keeps transparency and is usually 70–90% smaller. Choose JPEG if the site you are uploading to does not accept WebP.
+                            Yes. By default every image keeps its original format, so a JPG stays JPG and a PNG stays PNG. PNGs are shrunk by reducing the number of colours, which keeps transparency and usually saves 50–80%. You can still pick JPEG or WebP under Output format if you want an even smaller file.
                         </div>
                     </div>
                 </div>
@@ -394,6 +395,8 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js" integrity="sha512-XMVd28F1oH/O71fzwBnV7HucLxVwtxf26XV8P4wPk26EDxuGZ91N8bsOttmnomcCD3CS5ZMRL50H0GgOHvegtg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script src="app.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pako/2.1.0/pako.min.js" integrity="sha512-g2TeAWw5GPnX7z0Kn8nFbYfeHcvAu/tx6d6mrLe/90mkCxO+RcptyYpksUz35EO337F83bZwcmUyHiHamspkfg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/upng-js/2.1.0/UPNG.min.js" integrity="sha512-0EGvUncys73hZ+0MCLp5YxHM29nv0HO8oMVK0Tsz0DtuGa6G8+6YZUdHdt3gN1rKsVWvxuBmCj0y/2Zon7yopQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script src="tools.js"></script>
 </body>
 </html>
