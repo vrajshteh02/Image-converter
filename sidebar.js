@@ -14,14 +14,36 @@
         document.body.classList.toggle('sidebar-locked', open);
         if (open) search.focus();
     }
-    toggle.addEventListener('click', function () { setOpen(true); });
-    closeBtn.addEventListener('click', function () { setOpen(false); toggle.focus(); });
+    // Desktop: hide/show the sidebar column (remembered across pages; applied early by the <head> script)
+    var desktop = window.matchMedia('(min-width: 1101px)');
+    var root = document.documentElement;
+    function setCollapsed(collapsed) {
+        root.classList.toggle('sidebar-collapsed', collapsed);
+        try { localStorage.setItem('sidebarCollapsed', collapsed ? '1' : '0'); } catch (e) { /* storage blocked */ }
+        syncExpanded();
+    }
+    function syncExpanded() {
+        var expanded = desktop.matches ? !root.classList.contains('sidebar-collapsed') : sidebar.classList.contains('is-open');
+        toggle.setAttribute('aria-expanded', expanded ? 'true' : 'false');
+    }
+    if (desktop.addEventListener) desktop.addEventListener('change', syncExpanded);
+    syncExpanded();
+
+    toggle.addEventListener('click', function () {
+        if (desktop.matches) { setCollapsed(false); search.focus(); }
+        else setOpen(true);
+    });
+    closeBtn.addEventListener('click', function () {
+        if (desktop.matches) setCollapsed(true);
+        else setOpen(false);
+        toggle.focus();
+    });
     backdrop.addEventListener('click', function () { setOpen(false); });
     document.addEventListener('keydown', function (e) {
         if (e.key === 'Escape' && sidebar.classList.contains('is-open')) { setOpen(false); toggle.focus(); }
     });
     sidebar.querySelectorAll('.sidebar-link').forEach(function (a) {
-        a.addEventListener('click', function () { setOpen(false); });
+        a.addEventListener('click', function () { if (!desktop.matches) setOpen(false); });
     });
 
     // Filter sidebar links and tool cards together

@@ -1,6 +1,6 @@
 /* ==========================================================================
    PicsConvert - Video tools (video-tools.js)
-   Compress Video, Video Converter, Video to MP3, Video to GIF and Trim Video.
+   Compress Video, Video Converter and Video Watermark Remover.
    Everything runs on ffmpeg.wasm inside the browser tab; nothing is uploaded.
    Loaded after app.js (escapeHTML, theme) and tools.js (shared helpers), plus
    vendor/ffmpeg/ffmpeg.js, which must be served from this origin because it
@@ -247,7 +247,7 @@
             jobs({ input, info }) {
                 const target = valueOf('vfFormat', 'mp4');
                 if (target === 'mp3') return TOOLS.audio.jobs({ input, info }, 'mp3', '192');
-                if (!info.vcodec) throw new Error('This file has no video track. Use Video to MP3 for audio files.');
+                if (!info.vcodec) throw new Error('This file has no video track. Choose MP3 as the output format for audio files.');
 
                 const out = `output.${target}`;
                 const mime = { mp4: 'video/mp4', mov: 'video/quicktime', mkv: 'video/x-matroska', webm: 'video/webm', avi: 'video/x-msvideo' }[target];
@@ -353,6 +353,55 @@
                     { ...precise, label: 'Re-encoding for an exact cut' }
                 ];
             }
+        },
+
+        // ---------------- Video Watermark Remover ----------------
+        delogo: {
+            verb: 'Removing watermark',
+            needsFrame: true,
+            readyText: 'Drag a box over the watermark on the video, then press "Remove watermark".',
+            canRun: () => !!(window.watermarkBoxes && window.watermarkBoxes().length),
+            jobs({ input, info }) {
+                if (!info.vcodec) throw new Error('This file has no video track.');
+                const W = info.width || preview.videoWidth;
+                const H = info.height || preview.videoHeight;
+                if (!W || !H) throw new Error('The size of this video could not be read.');
+                const even2 = v => Math.floor(v / 2) * 2;
+                // Boxes come in as fractions of the frame; keep them inside the picture with even sizes
+                const rects = (window.watermarkBoxes ? window.watermarkBoxes() : []).map(b => {
+                    const x = even2(clampValue(b.x * W, 2, W - 10));
+                    const y = even2(clampValue(b.y * H, 2, H - 10));
+                    const w = even2(clampValue(b.w * W, 8, W - 2 - x));
+                    const h = even2(clampValue(b.h * H, 8, H - 2 - y));
+                    return w >= 8 && h >= 8 ? { x, y, w, h } : null;
+                }).filter(Boolean);
+                if (!rects.length) throw new Error('Drag a box over the watermark first.');
+
+                const scale = scaleFilter(info, 0);
+                let video;
+                if (chipValue('vwMode', 'fill') === 'blur') {
+                    let graph = `[0:v]split=${rects.length + 1}[base]${rects.map((_, i) => `[c${i}]`).join('')};`;
+                    let prev = 'base';
+                    rects.forEach((r, i) => {
+                        const rad = Math.max(1, Math.min(20, Math.floor(Math.min(r.w, r.h) / 4) - 1));
+                        graph += `[c${i}]crop=${r.w}:${r.h}:${r.x}:${r.y},boxblur=${rad}:3[b${i}];[${prev}][b${i}]overlay=${r.x}:${r.y}[o${i}];`;
+                        prev = `o${i}`;
+                    });
+                    graph += `[${prev}]${scale}[v]`;
+                    video = ['-filter_complex', graph, '-map', '[v]', '-map', '0:a:0?'];
+                } else {
+                    const chain = rects.map(r => `delogo=x=${r.x}:y=${r.y}:w=${r.w}:h=${r.h}`).join(',');
+                    video = ['-map', '0:v:0', '-map', '0:a:0?', '-vf', `${chain},${scale}`];
+                }
+                const out = 'output.mp4';
+                const base = { out, mime: 'video/mp4', ext: 'mp4', duration: info.duration };
+                const make = audio => ({ ...base, args: ['-i', input.path, ...video, ...H264, '-crf', '20', ...audio, ...FASTSTART, out] });
+                if (!info.acodec) return [make(['-an'])];
+                const jobs = [];
+                if (['aac', 'mp3'].includes(info.acodec)) jobs.push(make(['-c:a', 'copy']));
+                jobs.push(make(['-c:a', 'aac', '-b:a', '160k']));
+                return jobs;
+            }
         }
     };
 
@@ -417,7 +466,33 @@
     }
 
     function updateRunState() {
-        runBtn.disabled = !current || busy;
+        runBtn.disabled = !current || busy || (tool.canRun ? !tool.canRun() : false);
+    }
+    window.videoToolRefresh = updateRunState;
+    const READY_TEXT = tool.readyText || 'Ready. Choose your settings and press the button.';
+
+    // Still frame for formats the browser cannot play (so the watermark can still be marked)
+    async function extractFrame(target) {
+        const t = Math.min(1, (target.info.duration || 0) / 2);
+        await runFFmpeg(['-ss', t.toFixed(2), '-i', target.input.path, '-frames:v', '1', '-vf', scaleFilter(target.info, 0), '-q:v', '3', 'frame.jpg'], 0);
+        const data = await ffmpeg.readFile('frame.jpg');
+        await ffmpeg.deleteFile('frame.jpg').catch(() => {});
+        return URL.createObjectURL(new Blob([data], { type: 'image/jpeg' }));
+    }
+
+    function requestFrame() {
+        if (!tool.needsFrame || !current || current.frameRequested) return;
+        const mine = current;
+        mine.frameRequested = true;
+        prepareInput()
+            .then(async () => {
+                if (busy || current !== mine || !mine.info.vcodec) return;
+                const url = await extractFrame(mine);
+                if (current !== mine) { URL.revokeObjectURL(url); return; }
+                mine.frameURL = url;
+                window.dispatchEvent(new CustomEvent('videotool:frame', { detail: { url } }));
+            })
+            .catch(() => { if (current === mine) setStatus('A preview frame could not be made for this video.'); });
     }
 
     // Duration known (from the <video> tag or ffmpeg) -> set up trim / GIF sliders
@@ -458,6 +533,7 @@
     async function releaseCurrent() {
         if (current) {
             URL.revokeObjectURL(current.url);
+            if (current.frameURL) URL.revokeObjectURL(current.frameURL);
             if (current.input) await current.input.release();
         }
         current = null;
@@ -477,16 +553,17 @@
         progressWrap.hidden = true;
         previewNote.hidden = true;
         preview.hidden = false;
+        window.dispatchEvent(new CustomEvent('videotool:open'));
         preview.src = current.url;
         renderMeta();
         updateRunState();
-        setStatus('Ready. Choose your settings and press the button.');
+        setStatus(READY_TEXT);
 
         // Start downloading the engine and reading the file in the background
         const mine = current;
         onEngineProgress = (loaded, total) => { if (!busy) setStatus(engineStatusText(loaded, total)); };
         prepareInput()
-            .then(() => { if (current === mine && !busy) setStatus('Ready. Choose your settings and press the button.'); })
+            .then(() => { if (current === mine && !busy) setStatus(READY_TEXT); })
             .catch(err => { if (current === mine && !busy) setStatus(err.message); });
     }
 
@@ -500,6 +577,7 @@
         if (!current || !preview.getAttribute('src')) return;
         preview.hidden = true;
         previewNote.hidden = false;
+        requestFrame();
     });
 
     async function run() {
@@ -729,5 +807,195 @@
             }
             startEl.dispatchEvent(new Event('change', { bubbles: true }));
         });
+    });
+})();
+
+// ==========================================================================
+// 6. WATERMARK BOXES (Video Watermark Remover)
+// Boxes are stored as fractions of the frame so they survive any resize.
+// ==========================================================================
+
+(function initWatermarkBoxes() {
+    const root = document.getElementById('videoTool');
+    if (!root || root.dataset.tool !== 'delogo') return;
+    const $ = id => document.getElementById(id);
+    const stage = $('wmStage');
+    const layer = $('wmLayer');
+    const hint = $('wmHint');
+    const video = $('videoPreview');
+    const frame = $('videoFrame');
+    const note = $('videoPreviewNote');
+    const player = $('wmPlayer');
+    const playBtn = $('wmPlay');
+    const seek = $('wmSeek');
+    const timeText = $('wmTime');
+    const clearBtn = $('wmClearBoxes');
+    const countText = $('wmBoxCount');
+    const MAX_BOXES = 8;
+    const MIN_SIZE = 0.012;
+    const fmt = s => (window.videoFormatClock ? window.videoFormatClock(s) : `${Math.floor(s)}s`);
+    const ICON_X = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg>';
+    let boxes = [];
+
+    window.watermarkBoxes = () => boxes.filter(b => b.w >= MIN_SIZE && b.h >= MIN_SIZE).map(({ x, y, w, h }) => ({ x, y, w, h }));
+
+    function changed() {
+        const n = boxes.length;
+        countText.innerText = `${n} ${n === 1 ? 'box' : 'boxes'}`;
+        clearBtn.disabled = !n;
+        hint.hidden = n > 0;
+        // Let the main tool hide any old result and re-check the Run button
+        root.querySelector('.settings-section').dispatchEvent(new Event('change', { bubbles: true }));
+        if (window.videoToolRefresh) window.videoToolRefresh();
+    }
+
+    function place(b) {
+        Object.assign(b.el.style, { left: `${b.x * 100}%`, top: `${b.y * 100}%`, width: `${b.w * 100}%`, height: `${b.h * 100}%` });
+    }
+
+    function addBox(x, y, w, h) {
+        const el = document.createElement('div');
+        el.className = 'wm-box';
+        el.innerHTML = `<button type="button" class="wm-box-del" aria-label="Remove this box">${ICON_X}</button><span class="wm-box-handle" aria-hidden="true"></span>`;
+        const b = { x, y, w, h, el };
+        boxes.push(b);
+        layer.appendChild(el);
+        place(b);
+        return b;
+    }
+
+    function removeBox(b) {
+        b.el.remove();
+        boxes = boxes.filter(o => o !== b);
+    }
+
+    function clearBoxes() {
+        boxes.forEach(b => b.el.remove());
+        boxes = [];
+        changed();
+    }
+
+    // Line the drawing layer up with the visible picture (videos are letterboxed in the stage)
+    function activeMedia() {
+        if (!frame.hidden && frame.naturalWidth) return { el: frame, w: frame.naturalWidth, h: frame.naturalHeight };
+        if (!video.hidden && video.videoWidth) return { el: video, w: video.videoWidth, h: video.videoHeight };
+        return null;
+    }
+    function fitLayer() {
+        const m = activeMedia();
+        if (!m || !m.el.offsetWidth) { layer.hidden = true; return; }
+        const ew = m.el.offsetWidth, eh = m.el.offsetHeight;
+        const s = Math.min(ew / m.w, eh / m.h);
+        const cw = m.w * s, ch = m.h * s;
+        Object.assign(layer.style, {
+            left: `${m.el.offsetLeft + (ew - cw) / 2}px`,
+            top: `${m.el.offsetTop + (eh - ch) / 2}px`,
+            width: `${cw}px`,
+            height: `${ch}px`
+        });
+        layer.hidden = false;
+    }
+    if (window.ResizeObserver) new ResizeObserver(fitLayer).observe(stage);
+    window.addEventListener('resize', fitLayer);
+    video.addEventListener('loadedmetadata', () => {
+        fitLayer();
+        seek.max = isFinite(video.duration) ? video.duration : 0;
+        seek.disabled = !(video.duration > 0);
+        playBtn.disabled = false;
+        // Show a frame a little way in, where watermarks have usually appeared
+        if (video.duration > 2) { try { video.currentTime = Math.min(1, video.duration / 4); } catch (e) { /* not seekable */ } }
+    });
+    frame.addEventListener('load', fitLayer);
+
+    // Drawing, moving and resizing boxes
+    layer.addEventListener('pointerdown', (e) => {
+        if (e.button !== 0 || e.target.closest('.wm-box-del')) return;
+        const rect = layer.getBoundingClientRect();
+        const px = clampValue((e.clientX - rect.left) / rect.width, 0, 1);
+        const py = clampValue((e.clientY - rect.top) / rect.height, 0, 1);
+        const boxEl = e.target.closest('.wm-box');
+        let mode, box, orig;
+        if (boxEl) {
+            box = boxes.find(b => b.el === boxEl);
+            mode = e.target.closest('.wm-box-handle') ? 'resize' : 'move';
+            orig = { x: box.x, y: box.y, w: box.w, h: box.h };
+        } else {
+            if (boxes.length >= MAX_BOXES) return;
+            box = addBox(px, py, 0, 0);
+            mode = 'create';
+        }
+        e.preventDefault();
+        if (!video.paused) video.pause();
+        layer.setPointerCapture(e.pointerId);
+        box.el.classList.add('is-active');
+
+        const onMove = (ev) => {
+            const qx = clampValue((ev.clientX - rect.left) / rect.width, 0, 1);
+            const qy = clampValue((ev.clientY - rect.top) / rect.height, 0, 1);
+            if (mode === 'create') {
+                box.x = Math.min(px, qx); box.y = Math.min(py, qy);
+                box.w = Math.abs(qx - px); box.h = Math.abs(qy - py);
+            } else if (mode === 'move') {
+                box.x = clampValue(orig.x + qx - px, 0, 1 - orig.w);
+                box.y = clampValue(orig.y + qy - py, 0, 1 - orig.h);
+            } else {
+                box.w = clampValue(orig.w + qx - px, MIN_SIZE, 1 - orig.x);
+                box.h = clampValue(orig.h + qy - py, MIN_SIZE, 1 - orig.y);
+            }
+            place(box);
+        };
+        const onUp = () => {
+            layer.removeEventListener('pointermove', onMove);
+            layer.removeEventListener('pointerup', onUp);
+            layer.removeEventListener('pointercancel', onUp);
+            box.el.classList.remove('is-active');
+            if (mode === 'create' && (box.w < MIN_SIZE || box.h < MIN_SIZE)) removeBox(box);
+            changed();
+        };
+        layer.addEventListener('pointermove', onMove);
+        layer.addEventListener('pointerup', onUp);
+        layer.addEventListener('pointercancel', onUp);
+    });
+    layer.addEventListener('click', (e) => {
+        const del = e.target.closest('.wm-box-del');
+        if (!del) return;
+        const b = boxes.find(o => o.el === del.parentElement);
+        if (b) { removeBox(b); changed(); }
+    });
+    clearBtn.addEventListener('click', clearBoxes);
+
+    // Simple player (the native controls would get in the way of drawing)
+    playBtn.addEventListener('click', () => {
+        if (video.paused) video.play().catch(() => {}); else video.pause();
+    });
+    video.addEventListener('play', () => { playBtn.innerText = 'Pause'; });
+    video.addEventListener('pause', () => { playBtn.innerText = 'Play'; });
+    video.addEventListener('timeupdate', () => {
+        seek.value = video.currentTime;
+        timeText.innerText = `${fmt(video.currentTime)} / ${fmt(video.duration || 0)}`;
+    });
+    seek.addEventListener('input', () => {
+        try { video.currentTime = Number(seek.value); } catch (e) { /* not seekable */ }
+    });
+
+    window.addEventListener('videotool:open', () => {
+        boxes.forEach(b => b.el.remove());
+        boxes = [];
+        frame.hidden = true;
+        frame.removeAttribute('src');
+        layer.hidden = true;
+        player.hidden = false;
+        playBtn.innerText = 'Play';
+        playBtn.disabled = true;
+        seek.disabled = true;
+        seek.value = 0;
+        timeText.innerText = '0:00';
+        changed();
+    });
+    window.addEventListener('videotool:frame', (e) => {
+        frame.src = e.detail.url;
+        frame.hidden = false;
+        note.hidden = true;
+        player.hidden = true;
     });
 })();

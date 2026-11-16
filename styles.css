@@ -3423,6 +3423,185 @@ textarea.form-input {
     cursor: not-allowed;
 }
 
+/* ================= WATERMARK REMOVERS ================= */
+/* Video: boxes drawn over the preview */
+.wm-stage {
+    position: relative;
+}
+.wm-frame {
+    display: block;
+    width: 100%;
+    max-height: 420px;
+    object-fit: contain;
+    background: #000;
+}
+.wm-layer {
+    position: absolute;
+    touch-action: none;
+    cursor: crosshair;
+    user-select: none;
+}
+.wm-layer-hint {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    padding: 0.45rem 0.85rem;
+    border-radius: 999px;
+    background: rgba(0, 0, 0, 0.66);
+    color: #fff;
+    font-size: 0.82rem;
+    line-height: 1.2;
+    white-space: nowrap;
+    pointer-events: none;
+}
+.wm-box {
+    position: absolute;
+    border: 2px solid var(--primary);
+    background: color-mix(in srgb, var(--primary) 22%, transparent);
+    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.55);
+    cursor: move;
+}
+.wm-box.is-active {
+    background: color-mix(in srgb, var(--primary) 32%, transparent);
+}
+.wm-box-del {
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    width: 20px;
+    height: 20px;
+    padding: 0;
+    border: none;
+    border-radius: 50%;
+    background: var(--primary);
+    color: #fff;
+    display: grid;
+    place-items: center;
+    cursor: pointer;
+}
+.wm-box-del svg {
+    width: 11px;
+    height: 11px;
+}
+.wm-box-handle {
+    position: absolute;
+    right: -2px;
+    bottom: -2px;
+    width: 12px;
+    height: 12px;
+    background: #fff;
+    border: 2px solid var(--primary);
+    border-radius: 3px;
+    cursor: nwse-resize;
+}
+.wm-player {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+}
+.wm-player .range-slider {
+    flex: 1;
+}
+.wm-player .chip-btn {
+    min-width: 4.5rem;
+}
+.wm-time {
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    color: var(--text-tertiary);
+    white-space: nowrap;
+}
+.wm-box-count-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+}
+.wm-box-count-row .setting-label {
+    justify-content: flex-start;
+    gap: 0.5rem;
+    margin-bottom: 0;
+    white-space: nowrap;
+}
+
+/* Image: painting a selection over the photo */
+.wm-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+.wm-toolbar .btn {
+    padding: 0.45rem 0.85rem;
+    font-size: 0.82rem;
+}
+.wm-canvas-area {
+    display: flex;
+    justify-content: center;
+    padding: 0.75rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    background-color: var(--bg-surface-elevated);
+    background-image:
+        linear-gradient(45deg, var(--border) 25%, transparent 25%),
+        linear-gradient(-45deg, var(--border) 25%, transparent 25%),
+        linear-gradient(45deg, transparent 75%, var(--border) 75%),
+        linear-gradient(-45deg, transparent 75%, var(--border) 75%);
+    background-size: 18px 18px;
+    background-position: 0 0, 0 9px, 9px -9px, -9px 0;
+    overflow: hidden;
+}
+.wm-canvas-wrap {
+    position: relative;
+    line-height: 0;
+}
+.wm-canvas-wrap canvas {
+    display: block;
+}
+.wm-mask,
+.wm-compare {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+}
+.wm-mask {
+    opacity: 0.5;
+    touch-action: none;
+    cursor: none;
+}
+.wm-mask.is-box {
+    cursor: crosshair;
+}
+.wm-canvas-wrap.is-busy .wm-mask {
+    cursor: progress;
+}
+.wm-canvas-wrap.is-comparing .wm-mask {
+    visibility: hidden;
+}
+.wm-cursor {
+    position: absolute;
+    border: 2px solid #fff;
+    border-radius: 50%;
+    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.6), inset 0 0 0 1px rgba(0, 0, 0, 0.6);
+    pointer-events: none;
+}
+.wm-cursor.is-erase {
+    border-style: dashed;
+}
+.wm-box-preview {
+    position: absolute;
+    border: 2px dashed #fff;
+    background: rgba(255, 59, 48, 0.35);
+    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.5);
+    pointer-events: none;
+}
+.wm-editor-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
 /* =====================================================================
    HOME — tools sidebar layout
    ===================================================================== */
@@ -3593,8 +3772,34 @@ textarea.form-input {
     flex-shrink: 0;
 }
 
-.sidebar-toggle,
+.sidebar-toggle {
+    display: none;
+    align-items: center;
+    gap: 0.5rem;
+    justify-self: start;
+    padding: 0.5rem 0.9rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    background: var(--bg-surface);
+    color: var(--text-primary);
+    font: inherit;
+    font-size: 0.88rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: border-color var(--transition-fast), color var(--transition-fast);
+}
+.sidebar-toggle:hover { border-color: var(--primary); color: var(--primary); }
+.sidebar-toggle svg { width: 18px; height: 18px; }
 .sidebar-backdrop { display: none; }
+.sidebar-close:hover { background: var(--bg-surface-elevated); color: var(--text-primary); }
+
+/* Desktop: the sidebar can be hidden and brought back with the "All tools" button */
+@media (min-width: 1101px) {
+    .sidebar-close { display: block; margin-left: 0.5rem; }
+    html.sidebar-collapsed .home-layout { grid-template-columns: minmax(0, 1fr); gap: 0; }
+    html.sidebar-collapsed .tools-sidebar { display: none; }
+    html.sidebar-collapsed .sidebar-toggle { display: inline-flex; margin-top: 1.25rem; }
+}
 
 /* Main column */
 .home-main { min-width: 0; padding: 2.25rem 0 0; }
@@ -3676,21 +3881,8 @@ textarea.form-input {
     .home-main { padding-top: 1.25rem; }
     .sidebar-toggle {
         display: inline-flex;
-        align-items: center;
-        gap: 0.5rem;
-        justify-self: start;
         margin-top: 1rem;
-        padding: 0.5rem 0.9rem;
-        border: 1px solid var(--border);
-        border-radius: var(--radius-md);
-        background: var(--bg-surface);
-        color: var(--text-primary);
-        font: inherit;
-        font-size: 0.88rem;
-        font-weight: 600;
-        cursor: pointer;
     }
-    .sidebar-toggle svg { width: 18px; height: 18px; }
     .tools-sidebar {
         position: fixed;
         top: 0;

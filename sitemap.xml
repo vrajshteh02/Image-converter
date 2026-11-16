@@ -163,21 +163,21 @@
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://webp-convert-ai.netlify.app/video-to-mp3.html</loc>
-    <lastmod>2026-11-06</lastmod>
+    <loc>https://webp-convert-ai.netlify.app/remove-watermark-image.html</loc>
+    <lastmod>2026-11-16</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://webp-convert-ai.netlify.app/video-to-gif.html</loc>
-    <lastmod>2026-11-06</lastmod>
+    <loc>https://webp-convert-ai.netlify.app/remove-watermark-video.html</loc>
+    <lastmod>2026-11-16</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://webp-convert-ai.netlify.app/trim-video.html</loc>
-    <lastmod>2026-11-06</lastmod>
+    <loc>https://webp-convert-ai.netlify.app/blog-ai-labels-content-credentials.html</loc>
+    <lastmod>2026-11-16</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.9</priority>
+    <priority>0.8</priority>
   </url>
 </urlset>

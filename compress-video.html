@@ -28,7 +28,7 @@
     <link rel="icon" type="image/x-icon" href="images/favicon.ico">
     <link rel="shortcut icon" href="images/favicon.ico">
 
-    <script>(function(){try{var m=localStorage.getItem('themeMode')||'system';if(m==='dark'||(m==='system'&&window.matchMedia('(prefers-color-scheme: dark)').matches)){document.documentElement.classList.add('dark');}}catch(e){}})();</script>
+    <script>(function(){try{var m=localStorage.getItem('themeMode')||'system';if(m==='dark'||(m==='system'&&window.matchMedia('(prefers-color-scheme: dark)').matches)){document.documentElement.classList.add('dark');}if(localStorage.getItem('sidebarCollapsed')==='1'){document.documentElement.classList.add('sidebar-collapsed');}}catch(e){}})();</script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&display=swap">
@@ -126,14 +126,13 @@
                                 <a href="image-converter.html" class="nav-dropdown-link">Image Converter</a>
                                 <a href="compress-image.html" class="nav-dropdown-link">Compress Image</a>
                                 <a href="resize-image.html" class="nav-dropdown-link">Resize Image</a>
+                                <a href="remove-watermark-image.html" class="nav-dropdown-link">Remove Watermark</a>
                             </div>
                             <div class="nav-dropdown-group">
                                 <p class="nav-dropdown-heading">Video tools</p>
                                 <a href="compress-video.html" class="nav-dropdown-link" aria-current="page">Compress Video</a>
                                 <a href="video-converter.html" class="nav-dropdown-link">Video Converter</a>
-                                <a href="video-to-mp3.html" class="nav-dropdown-link">Video to MP3</a>
-                                <a href="video-to-gif.html" class="nav-dropdown-link">Video to GIF</a>
-                                <a href="trim-video.html" class="nav-dropdown-link">Trim Video</a>
+                                <a href="remove-watermark-video.html" class="nav-dropdown-link">Remove Video Watermark</a>
                             </div>
                             <a href="/" class="nav-dropdown-all">View all tools &rarr;</a>
                         </div>
@@ -186,15 +185,14 @@
                     <p class="sidebar-heading">Image tools</p>
                     <a href="compress-image.html" class="sidebar-link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 14h6v6M20 10h-6V4M14 10l7-7M3 21l7-7"/></svg>Compress Image</a>
                     <a href="resize-image.html" class="sidebar-link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>Resize Image</a>
+                    <a href="remove-watermark-image.html" class="sidebar-link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m7 21-4.3-4.3c-1-1-1-2.5 0-3.4l9.6-9.6c1-1 2.5-1 3.4 0l5.6 5.6c1 1 1 2.5 0 3.4L13 21"/><path d="M22 21H7"/><path d="m5 11 9 9"/></svg>Remove Watermark</a>
                     <a href="image-converter.html" class="sidebar-link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h13l-3.5-3.5"/><path d="M20 16H7l3.5 3.5"/></svg>Image Converter</a>
                 </div>
                 <div class="sidebar-group">
                     <p class="sidebar-heading">Video tools</p>
                     <a href="compress-video.html" class="sidebar-link" aria-current="page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 14h6v6M20 10h-6V4M14 10l7-7M3 21l7-7"/></svg>Compress Video</a>
                     <a href="video-converter.html" class="sidebar-link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h13l-3.5-3.5"/><path d="M20 16H7l3.5 3.5"/></svg>Video Converter</a>
-                    <a href="video-to-mp3.html" class="sidebar-link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>Video to MP3</a>
-                    <a href="video-to-gif.html" class="sidebar-link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M10 9H8a1 1 0 0 0-1 1v4a1 1 0 0 0 1 1h2v-2.5M13 9v6M17 15V9h3M17 12h2"/></svg>Video to GIF</a>
-                    <a href="trim-video.html" class="sidebar-link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M20 4 8.12 15.88M14.47 14.48 20 20M8.12 8.12 12 12"/></svg>Trim Video</a>
+                    <a href="remove-watermark-video.html" class="sidebar-link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m7 21-4.3-4.3c-1-1-1-2.5 0-3.4l9.6-9.6c1-1 2.5-1 3.4 0l5.6 5.6c1 1 1 2.5 0 3.4L13 21"/><path d="M22 21H7"/><path d="m5 11 9 9"/></svg>Remove Video Watermark</a>
                 </div>
                 <div class="sidebar-group">
                     <p class="sidebar-heading">PDF tools</p>
@@ -441,13 +439,6 @@
             </div>
             <div class="learning-hub-grid">
                 <article class="learning-card tool-hub-card">
-                    <div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M20 4 8.12 15.88M14.47 14.48 20 20M8.12 8.12 12 12"/></svg></div>
-                    <span class="learning-tag">Video</span>
-                    <h3 class="learning-card-title">Trim Video</h3>
-                    <p class="learning-card-desc">Cut the start and end off a video without losing quality, or remove the sound.</p>
-                    <a href="trim-video.html" class="learning-link" aria-label="Open Trim Video"><span>Open tool</span><svg viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M12.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-2.293-2.293a1 1 0 010-1.414z" clip-rule="evenodd" /></svg></a>
-                </article>
-                <article class="learning-card tool-hub-card">
                     <div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h13l-3.5-3.5"/><path d="M20 16H7l3.5 3.5"/></svg></div>
                     <span class="learning-tag">Video</span>
                     <h3 class="learning-card-title">Video Converter</h3>
@@ -455,11 +446,18 @@
                     <a href="video-converter.html" class="learning-link" aria-label="Open Video Converter"><span>Open tool</span><svg viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M12.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-2.293-2.293a1 1 0 010-1.414z" clip-rule="evenodd" /></svg></a>
                 </article>
                 <article class="learning-card tool-hub-card">
-                    <div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg></div>
-                    <span class="learning-tag">Video</span>
-                    <h3 class="learning-card-title">Video to MP3</h3>
-                    <p class="learning-card-desc">Pull the sound out of any video and save it as MP3, M4A or WAV.</p>
-                    <a href="video-to-mp3.html" class="learning-link" aria-label="Open Video to MP3"><span>Open tool</span><svg viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M12.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-2.293-2.293a1 1 0 010-1.414z" clip-rule="evenodd" /></svg></a>
+                    <div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 14h6v6M20 10h-6V4M14 10l7-7M3 21l7-7"/></svg></div>
+                    <span class="learning-tag">Image</span>
+                    <h3 class="learning-card-title">Image Compressor</h3>
+                    <p class="learning-card-desc">Shrink JPG, PNG and WebP photos, or hit an exact size like 100 KB for online forms.</p>
+                    <a href="compress-image.html" class="learning-link" aria-label="Open Image Compressor"><span>Open tool</span><svg viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M12.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-2.293-2.293a1 1 0 010-1.414z" clip-rule="evenodd" /></svg></a>
+                </article>
+                <article class="learning-card tool-hub-card">
+                    <div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m8 6 4-4 4 4"/><path d="M12 2v10.3a4 4 0 0 1-1.17 2.87L4 22"/><path d="m20 22-5-5"/></svg></div>
+                    <span class="learning-tag">PDF</span>
+                    <h3 class="learning-card-title">Merge PDF</h3>
+                    <p class="learning-card-desc">Join several PDFs into one file. Drag to set the order before merging.</p>
+                    <a href="merge-pdf.html" class="learning-link" aria-label="Open Merge PDF"><span>Open tool</span><svg viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M12.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-2.293-2.293a1 1 0 010-1.414z" clip-rule="evenodd" /></svg></a>
                 </article>
             </div>
         </section>
