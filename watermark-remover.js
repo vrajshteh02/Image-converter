@@ -2,8 +2,10 @@
    PicsConvert - Image Watermark Remover (watermark-remover.js)
    The user paints over a watermark (brush, box or eraser) and the marked area
    is rebuilt from the rest of the photo with a content-aware fill
-   (multi-scale PatchMatch inpainting). It runs in a Web Worker so the page
-   stays responsive. Nothing is uploaded.
+   (multi-scale PatchMatch inpainting). Within the painted area, only the
+   pixels that really belong to the watermark are replaced, and see-through
+   watermarks are reversed to recover the real picture underneath.
+   It runs in a Web Worker so the page stays responsive. Nothing is uploaded.
    Loaded after app.js and tools.js (loadImageFile, canvasToBlob,
    resolveOutputMime, drawResized, bindToolDropZone, bindChipGroup, ...).
    ========================================================================== */
@@ -456,8 +458,8 @@ function inpaintEngine() {
         levels.forEach(prepareLevel);
 
         const plan = levels.map((L, i) => ({
-            em: n === 1 ? 5 : i === n - 1 ? 10 : i === 0 ? 3 : 5,
-            passes: i === 0 && n > 1 ? 1 : 2
+            em: n === 1 ? (5) : i === n - 1 ? (10) : i === 0 ? (3) : (5),
+            passes: i === 0 && n > 1 ? (1) : (2)
         }));
         const cost = levels.map((L, i) => plan[i].em * (plan[i].passes + 1) * Math.max(1, L.targets.length));
         const total = cost.reduce((a, b) => a + b, 0);
@@ -501,7 +503,327 @@ function inpaintEngine() {
         return out;
     }
 
-    return { inpaint };
+    // ---------------- Smart selection ----------------
+    // People paint loosely, so the selection holds a lot of real picture between and around
+    // the watermark's strokes. Find the pixels that really belong to the watermark: colours
+    // that are common inside the selection but rare in the picture just around it, or that
+    // differ clearly from a first guess of the background. Everything else is kept as it is.
+    function refineMask(rgba, guess, w, h, mask) {
+        const N = w * h;
+        // Ring of real picture around the selection
+        const inv = new Uint8Array(N);
+        for (let i = 0; i < N; i++) inv[i] = mask[i] ? 0 : 1;
+        const { d: dOut } = distanceField({ w, h, mask: inv });
+        const RING = 12;
+        const B = 16;                         // 16 levels per channel
+        const binOf = i => ((rgba[i * 4] >> 4) * B + (rgba[i * 4 + 1] >> 4)) * B + (rgba[i * 4 + 2] >> 4);
+        const hS = new Float32Array(B * B * B), hR = new Float32Array(B * B * B);
+        let nS = 0, nR = 0;
+        for (let i = 0; i < N; i++) {
+            if (mask[i]) { hS[binOf(i)]++; nS++; }
+            else if (dOut[i] <= RING) { hR[binOf(i)]++; nR++; }
+        }
+        if (!nR || nS < 50) return null;
+        // Smooth both histograms over neighbouring bins (3x3x3)
+        const smooth = (hst, n) => {
+            const o = new Float32Array(hst.length);
+            for (let r = 0; r < B; r++) for (let g = 0; g < B; g++) for (let b = 0; b < B; b++) {
+                let s = 0;
+                for (let dr = -1; dr <= 1; dr++) { const rr = r + dr; if (rr < 0 || rr >= B) continue;
+                    for (let dg = -1; dg <= 1; dg++) { const gg = g + dg; if (gg < 0 || gg >= B) continue;
+                        for (let db = -1; db <= 1; db++) { const bb = b + db; if (bb < 0 || bb >= B) continue;
+                            s += hst[(rr * B + gg) * B + bb]; } } }
+                o[(r * B + g) * B + b] = s / n;
+            }
+            return o;
+        };
+        const sS = smooth(hS, nS), sR = smooth(hR, nR);
+        const eps = 1 / Math.max(nR, 400);
+        // How typical each selected pixel's colour is of the selection versus the ring,
+        // and how far it is from the background guess
+        const lr = new Float32Array(N), diff = new Float32Array(N);
+        for (let i = 0; i < N; i++) {
+            if (!mask[i]) continue;
+            const b = binOf(i);
+            lr[i] = (sS[b] + eps) / (sR[b] + eps);
+            const dr = rgba[i * 4] - guess[i * 4], dg = rgba[i * 4 + 1] - guess[i * 4 + 1], db = rgba[i * 4 + 2] - guess[i * 4 + 2];
+            diff[i] = Math.sqrt((dr * dr + dg * dg + db * db) / 3);
+        }
+        // How far the background guess is typically off on plain background (texture noise):
+        // use the low end of the differences
+        const ds = [];
+        for (let i = 0; i < N; i++) if (mask[i] && lr[i] < 1.5) ds.push(diff[i]);
+        ds.sort((a, b) => a - b);
+        const noise = ds.length ? ds[Math.floor(ds.length * 0.5)] : 10;
+        const CORE_LR = 4, GROW_LR = 1.6;
+        const coreDiff = Math.max(40, noise * (4));
+        const out = new Uint8Array(N);
+        const queue = [];
+        for (let i = 0; i < N; i++) {
+            if (!mask[i]) continue;
+            if (lr[i] >= CORE_LR || diff[i] >= coreDiff) { out[i] = 1; queue.push(i); }
+        }
+        const core = new Uint8Array(out);
+        // Grow into soft edges and shadows: neighbouring pixels that are still unusual
+        const GROW = 6;
+        const depth = new Uint8Array(N);
+        for (let qi = 0; qi < queue.length; qi++) {
+            const i = queue[qi];
+            if (depth[i] >= GROW) continue;
+            const x = i % w, y = (i - x) / w;
+            for (let dy = -1; dy <= 1; dy++) for (let dx = -1; dx <= 1; dx++) {
+                const nx = x + dx, ny = y + dy;
+                if (nx < 0 || ny < 0 || nx >= w || ny >= h) continue;
+                const j = ny * w + nx;
+                if (out[j] || !mask[j]) continue;
+                if (lr[j] >= GROW_LR || diff[j] >= coreDiff * 0.5) { out[j] = 1; depth[j] = depth[i] + 1; queue.push(j); }
+            }
+        }
+        // Safety margin for anti-aliased edges, then drop specks of kept picture
+        const PAD = 2;
+        let cur = out;
+        for (let it = 0; it < PAD; it++) {
+            const nxt = new Uint8Array(cur);
+            for (let i = 0; i < N; i++) {
+                if (cur[i] || !mask[i]) continue;
+                const x = i % w;
+                if ((x > 0 && cur[i - 1]) || (x < w - 1 && cur[i + 1]) || (i >= w && cur[i - w]) || (i + w < N && cur[i + w])) nxt[i] = 1;
+            }
+            cur = nxt;
+        }
+        return { mask: cur, core };
+    }
+
+
+    // ---------------- See-through watermarks ----------------
+    // A semi-transparent watermark is a blend: seen = a * colour + (1 - a) * picture.
+    // The picture is still there, so when the watermark's colour and opacity can be
+    // measured, undo the blend instead of inventing new pixels.
+    // The measurement compares pixels just inside the watermark with real picture just
+    // outside it: with the right colour and opacity, undoing the blend makes the two sides
+    // match, so the watermark's outline disappears.
+    function unblend(rgba, guess, w, h, mask, refined, core) {
+        const N = w * h;
+        const notCore = new Uint8Array(N);
+        for (let i = 0; i < N; i++) notCore[i] = core[i] ? 0 : 1;
+        const dIn = distanceField({ w, h, mask: core }).d;      // core pixels: distance to the outside
+        const dOut = distanceField({ w, h, mask: notCore }).d;  // other pixels: distance to the core
+        const DIRS = [[1, 0], [-1, 0], [0, 1], [0, -1], [1, 1], [1, -1], [-1, 1], [-1, -1]];
+        const P = [], Qs = [];
+        for (let i = 0; i < N; i++) {
+            if (!core[i] || dIn[i] < 1.5 || dIn[i] > 5) continue;
+            const x = i % w, y = (i - x) / w;
+            let q = -1, best = 99;
+            for (const [dx, dy] of DIRS) {
+                for (let s = 1; s <= 9 && s < best; s++) {
+                    const xx = x + dx * s, yy = y + dy * s;
+                    if (xx < 0 || yy < 0 || xx >= w || yy >= h) break;
+                    const j = yy * w + xx;
+                    if (core[j] || dOut[j] < 2) continue;   // still on the watermark or its soft edge
+                    if (dOut[j] <= 6) { q = j; best = s; }
+                    break;
+                }
+            }
+            if (q >= 0) { P.push(i); Qs.push(q); }
+        }
+        if (P.length < 60) return null;
+
+        const mean = [0, 0, 0];
+        let nc = 0;
+        for (let i = 0; i < N; i++) if (core[i] && dIn[i] >= 1.5) { mean[0] += rgba[i * 4]; mean[1] += rgba[i * 4 + 1]; mean[2] += rgba[i * 4 + 2]; nc++; }
+        const cands = [[255, 255, 255], [0, 0, 0], [128, 128, 128]];
+        if (nc) cands.push(mean.map(v => v / nc));
+
+        const n = P.length;
+        // Also fit the colour itself: picture = K * seen + b (per channel), colour = b / (1 - K)
+        {
+            let keep = null, K = 1;
+            const bb = [0, 0, 0];
+            const r2 = new Float64Array(n);
+            for (let round = 0; round < 4; round++) {
+                const mp = [0, 0, 0], mq = [0, 0, 0];
+                let cnt = 0;
+                for (let k = 0; k < n; k++) {
+                    if (keep && !keep[k]) continue;
+                    const p = P[k] * 4, q = Qs[k] * 4;
+                    for (let ch = 0; ch < 3; ch++) { mp[ch] += rgba[p + ch]; mq[ch] += rgba[q + ch]; }
+                    cnt++;
+                }
+                if (cnt < 30) break;
+                for (let ch = 0; ch < 3; ch++) { mp[ch] /= cnt; mq[ch] /= cnt; }
+                let num = 0, den = 0;
+                for (let k = 0; k < n; k++) {
+                    if (keep && !keep[k]) continue;
+                    const p = P[k] * 4, q = Qs[k] * 4;
+                    for (let ch = 0; ch < 3; ch++) { const u = rgba[p + ch] - mp[ch]; num += u * (rgba[q + ch] - mq[ch]); den += u * u; }
+                }
+                if (den < 1) break;
+                K = num / den;
+                for (let ch = 0; ch < 3; ch++) bb[ch] = mq[ch] - K * mp[ch];
+                for (let k = 0; k < n; k++) {
+                    const p = P[k] * 4, q = Qs[k] * 4;
+                    let e = 0;
+                    for (let ch = 0; ch < 3; ch++) { const d = K * rgba[p + ch] + bb[ch] - rgba[q + ch]; e += d * d; }
+                    r2[k] = e;
+                }
+                const s = Float64Array.from(r2).sort();
+                const cut = s[Math.floor(n * 0.75)];
+                keep = new Uint8Array(n);
+                for (let k = 0; k < n; k++) keep[k] = r2[k] <= cut ? 1 : 0;
+            }
+            if (K > 1.15) {
+                const c = bb.map(v => v / (1 - K));
+                if (c.every(v => v > -40 && v < 295)) cands.push(c.map(v => Math.min(255, Math.max(0, v))));
+            }
+        }
+        const res = new Float64Array(n);
+        const trimmedMean = arr => {
+            const s = Float64Array.from(arr).sort();
+            const m = Math.max(1, Math.floor(s.length * 0.75));
+            let t = 0;
+            for (let k = 0; k < m; k++) t += s[k];
+            return t / m;
+        };
+        // Step across the outline as it is now
+        for (let k = 0; k < n; k++) {
+            const p = P[k] * 4, q = Qs[k] * 4;
+            let e = 0;
+            for (let ch = 0; ch < 3; ch++) { const d = rgba[p + ch] - rgba[q + ch]; e += d * d; }
+            res[k] = e;
+        }
+        const base = trimmedMean(res);
+        let best = null;
+        for (const c of cands) {
+            // seen = a*c + (1-a)*picture  =>  picture = c + (seen - c) * K, K = 1/(1-a)
+            let K = 1, keep = null;
+            for (let round = 0; round < 3; round++) {
+                let num = 0, den = 0;
+                for (let k = 0; k < n; k++) {
+                    if (keep && !keep[k]) continue;
+                    const p = P[k] * 4, q = Qs[k] * 4;
+                    for (let ch = 0; ch < 3; ch++) {
+                        const u = rgba[p + ch] - c[ch], t = rgba[q + ch] - c[ch];
+                        num += u * t; den += u * u;
+                    }
+                }
+                if (den < 1) break;
+                K = Math.max(1, Math.min(20, num / den));
+                for (let k = 0; k < n; k++) {
+                    const p = P[k] * 4, q = Qs[k] * 4;
+                    let e = 0;
+                    for (let ch = 0; ch < 3; ch++) { const d = c[ch] + (rgba[p + ch] - c[ch]) * K - rgba[q + ch]; e += d * d; }
+                    res[k] = e;
+                }
+                // drop the worst quarter (texture that really changes across the outline) and refit
+                const s = Float64Array.from(res).sort();
+                const cut = s[Math.floor(n * 0.75)];
+                keep = new Uint8Array(n);
+                for (let k = 0; k < n; k++) keep[k] = res[k] <= cut ? 1 : 0;
+            }
+            const ratio = trimmedMean(res) / Math.max(1, base);
+            const alpha = 1 - 1 / K;
+            if (!best || ratio < best.ratio) best = { c, alpha, ratio };
+        }
+        if (!best || best.ratio > (0.45) || best.alpha < 0.12 || best.alpha > (0.8)) return null;
+        const c = best.c;
+        let alpha = best.alpha;
+
+        // Per pixel: how much watermark is on it, from the first fill as a rough picture guess.
+        // Smoothed (median of 5x5) so texture in the guess does not leak in.
+        const a = new Float32Array(N).fill(NaN);
+        for (let i = 0; i < N; i++) {
+            if (!refined[i]) continue;
+            const v0 = c[0] - guess[i * 4], v1 = c[1] - guess[i * 4 + 1], v2 = c[2] - guess[i * 4 + 2];
+            const den = v0 * v0 + v1 * v1 + v2 * v2;
+            if (den < 3 * 30 * 30) continue;      // picture too close to the watermark colour to tell
+            const d0 = rgba[i * 4] - guess[i * 4], d1 = rgba[i * 4 + 1] - guess[i * 4 + 1], d2 = rgba[i * 4 + 2] - guess[i * 4 + 2];
+            a[i] = (d0 * v0 + d1 * v1 + d2 * v2) / den;
+        }
+        // The outline fit slightly underestimates opacity; the middle of the watermark gives a
+        // second, unbiased reading. Use it when the two agree.
+        {
+            const vals = [];
+            for (let i = 0; i < N; i++) if (core[i] && dIn[i] >= 2 && a[i] === a[i]) vals.push(a[i]);
+            if (vals.length >= 30) {
+                vals.sort((p, q) => p - q);
+                const med = vals[vals.length >> 1];
+                if (Math.abs(med - alpha) < 0.12) alpha = med;
+            }
+        }
+        const out = new Uint8ClampedArray(rgba);
+        const unknown = new Uint8Array(N);   // parts the blend does not explain (solid bits): fill those
+        let bad = 0, total = 0;
+        const buf = [];
+        for (let i = 0; i < N; i++) {
+            if (!refined[i]) continue;
+            let ai;
+            if (core[i] && dIn[i] >= 1.5) {
+                ai = alpha;                               // inside the watermark
+            } else if (core[i]) {
+                // its soft edge: partly covered
+                const x = i % w, y = (i - x) / w;
+                buf.length = 0;
+                for (let dy = -2; dy <= 2; dy++) { const yy = y + dy; if (yy < 0 || yy >= h) continue;
+                    for (let dx = -2; dx <= 2; dx++) { const xx = x + dx; if (xx < 0 || xx >= w) continue;
+                        const j = yy * w + xx; if (a[j] === a[j]) buf.push(a[j]); } }
+                if (!buf.length) { ai = core[i] ? alpha : 0; }
+                else {
+                    buf.sort((p, q) => p - q);
+                    const s = buf[buf.length >> 1], r = a[i];
+                    if (s >= 0.7 * alpha) ai = alpha;
+                    else if (s <= 0.25 * alpha) ai = 0;
+                    else ai = Math.min(alpha, Math.max(0, r === r ? r : s));
+                }
+            } else {
+                continue;                                 // real picture: never changed
+            }
+            if (ai <= 0.02) continue;
+            const k = 1 / (1 - ai);
+            let off = false;
+            for (let ch = 0; ch < 3; ch++) {
+                const v = c[ch] + (rgba[i * 4 + ch] - c[ch]) * k;
+                if (v < -30 || v > 285) off = true;
+                out[i * 4 + ch] = v;
+            }
+            total++;
+            if (off) { unknown[i] = 1; bad++; }
+        }
+        if (!total || bad > total * (0.08)) return null;
+        return { out, unknown, bad, alpha, colour: c };
+    }
+
+    // Grow a mask by `r` pixels, staying inside `limit`
+    function growMask(m, w, h, r, limit) {
+        let cur = m;
+        for (let it = 0; it < r; it++) {
+            const nxt = new Uint8Array(cur);
+            for (let i = 0; i < cur.length; i++) {
+                if (cur[i] || !limit[i]) continue;
+                const x = i % w;
+                if ((x > 0 && cur[i - 1]) || (x < w - 1 && cur[i + 1]) || (i >= w && cur[i - w]) || (i + w < cur.length && cur[i + w])) nxt[i] = 1;
+            }
+            cur = nxt;
+        }
+        return cur;
+    }
+
+    // 1. Fill the whole selection: a first guess of the picture underneath.
+    // 2. If the watermark is see-through, undo the blend and keep the real picture.
+    // 3. Otherwise refill only the pixels that really belong to the watermark.
+    function inpaintSmart(rgba, w, h, maskIn, onProgress) {
+        const first = inpaint(rgba, w, h, maskIn, p => onProgress && onProgress(p * 0.55));
+        const rm = refineMask(rgba, first, w, h, maskIn);
+        if (!rm) return first;
+        let selected = 0, found = 0;
+        for (let i = 0; i < maskIn.length; i++) { selected += maskIn[i]; found += rm.mask[i]; }
+        if (!found) return first;
+        const ub = unblend(rgba, first, w, h, maskIn, rm.mask, rm.core);
+        if (ub) return ub.bad ? inpaint(ub.out, w, h, growMask(ub.unknown, w, h, 2, maskIn), null) : ub.out;
+        if (found > selected * 0.9) return first;   // the watermark fills the selection anyway
+        return inpaint(rgba, w, h, rm.mask, p => onProgress && onProgress(0.55 + p * 0.45));
+    }
+
+    return { inpaint: inpaintSmart };
 }
 
 // ==========================================================================
